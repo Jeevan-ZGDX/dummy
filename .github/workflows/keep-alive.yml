@@ -1,0 +1,54 @@
+name: Keep Alive Render
+
+# SECONDARY keep-alive only. The primary pinger is an external cron service
+# (cron-job.org) hitting /api/ping every 5 minutes.
+#
+# Why this is not the primary:
+#   - GitHub's `schedule` trigger is best-effort. Runs are routinely delayed
+#     20-60 minutes and may be dropped entirely under high load, so it cannot
+#     be relied on to stay inside Render's 15-minute idle window.
+#   - Scheduled workflows are auto-disabled after 60 days with no commit on the
+#     default branch. If this repo ever goes quiet, re-enable it in the Actions
+#     tab (or push any commit).
+#
+# Actions minutes are free and unlimited here because the repo is public.
+# The offset minutes (3,13,...) deliberately avoid the top-of-hour load spike.
+
+on:
+  schedule:
+    - cron: '3,13,23,33,43,53 * * * *' # every 10 min, offset off the hour
+  workflow_dispatch:
+
+concurrency:
+  group: keep-alive
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping keep-alive endpoint
+        env:
+          # Override without editing this file: repo Settings -> Secrets and
+          # variables -> Actions -> Variables -> KEEP_ALIVE_URL
+          PING_URL: ${{ vars.KEEP_ALIVE_URL || 'https://comp-dash.onrender.com/api/ping' }}
+        run: |
+          # --max-time 120 so a genuine cold start (~60s spin-up) is not
+          # mistaken for a failure. --retry covers transient 5xx during boot.
+          code=$(curl -sS -o /dev/null -w '%{http_code}' \
+                   --max-time 120 \
+                   --retry 3 --retry-delay 15 --retry-all-errors \
+                   "$PING_URL")
+          echo "Pinged $PING_URL -> HTTP $code at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          if [ "$code" = "503" ]; then
+            echo "::error::Service is suspended or unavailable (HTTP 503). Keep-alive cannot work until it is resumed in the Render dashboard."
+            exit 1
+          fi
+          if [ "$code" != "200" ]; then
+            echo "::error::Unexpected status HTTP $code"
+            exit 1
+          fi

@@ -1,0 +1,91 @@
+# Dependencies
+test-results/
+playwright-report/
+
+node_modules/
+.pnp
+.pnp.js
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+.turbo/
+coverage/
+*.tsbuildinfo
+
+# Expo / React Native
+.expo/
+android/
+ios/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+.env.local.template
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Secrets and local service files
+service-account.json
+apps/web/service-account.json
+*.pem
+*.crt
+
+# Uploads / generated content
+uploads/
+apps/web/uploads/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Clerk / Firebase local config
+.clerk/
+.firebase/
+.agents/
+.windsurf/
+.claude/
+
+# TypeScript
+*.tsbuildinfo
+
+/generated/prisma
+
+# SVG Files & Generated Schema Diagrams
+*.svg
+schema.svg
+**/schema.svg
+
+
+e2e/.auth/
+
+# Firebase Admin private keys — never commit, whatever they are named
+*firebase-adminsdk*.json
+*-adminsdk-*.json

@@ -1,0 +1,163 @@
+{
+  "app": {
+    "name": "Comp-Dash",
+    "tagline": "खोजें। भाग लें। हासिल करें।"
+  },
+  "auth": {
+    "login": "साइन इन",
+    "loginWithGoogle": "Google से जारी रखें",
+    "loginDescription": "अपने @citchennai.net खाते से साइन इन करें",
+    "logout": "साइन आउट",
+    "logoutConfirm": "क्या आप वाकई साइन आउट करना चाहते हैं?"
+  },
+  "home": {
+    "greeting": "नमस्ते, {{name}}",
+    "greetingEmoji": "👋",
+    "subtitle": "आपकी प्रतियोगिता का अवलोकन",
+    "verificationStatus": "सत्यापन स्थिति",
+    "pending": "लंबित",
+    "verified": "सत्यापित",
+    "completed": "पूर्ण",
+    "upcomingDeadlines": "आने वाली समय सीमा",
+    "viewAll": "सभी देखें",
+    "recentlyVerified": "हाल ही में सत्यापित",
+    "noUpcoming": "कोई आने वाली समय सीमा नहीं",
+    "noVerified": "अभी तक कोई सत्यापित प्रतियोगिता नहीं",
+    "registered": "पंजीकृत",
+    "wins": "जीत"
+  },
+  "discover": {
+    "title": "खोजें",
+    "searchPlaceholder": "प्रतियोगिताएं खोजें...",
+    "categories": {
+      "all": "सभी",
+      "hackathon": "हैकथॉन",
+      "internship": "इंटर्नशिप",
+      "workshop": "कार्यशाला",
+      "paperPresentation": "पेपर प्रेजेंटेशन",
+      "project": "प्रोजेक्ट",
+      "sports": "खेल",
+      "cultural": "सांस्कृतिक",
+      "other": "अन्य"
+    },
+    "noResults": "कोई प्रतियोगिता नहीं मिली",
+    "noResultsDescription": "अपने फ़िल्टर या खोज शब्दों को समायोजित करने का प्रयास करें",
+    "teamSize": "टीम का आकार",
+    "prizePool": "पुरस्कार राशि",
+    "deadline": "समय सीमा",
+    "registerNow": "अभी पंजीकरण करें"
+  },
+  "competition": {
+    "about": "के बारे में",
+    "eligibility": "पात्रता",
+    "timeline": "समयरेखा",
+    "rewards": "पुरस्कार",
+    "organizer": "आयोजक",
+    "instructions": "पंजीकरण निर्देश",
+    "tags": "टैग",
+    "readMore": "और पढ़ें",
+    "readLess": "कम पढ़ें",
+    "share": "साझा करें",
+    "bookmark": "बुकमार्क",
+    "unbookmark": "बुकमार्क हटाएं",
+    "registerNow": "अभी पंजीकरण करें",
+    "registrationClosed": "पंजीकरण बंद",
+    "national": "राष्ट्रीय",
+    "international": "अंतर्राष्ट्रीय",
+    "state": "राज्य",
+    "college": "कॉलेज"
+  },
+  "history": {
+    "title": "इतिहास",
+    "tabs": {
+      "all": "सभी",
+      "pending": "लंबित",
+      "verified": "सत्यापित",
+      "completed": "पूर्ण",
+      "rejected": "अस्वीकृत"
+    },
+    "registrationRequested": "पंजीकरण अनुरोधित",
+    "verifiedOn": "{{date}} को सत्यापित",
+    "noRegistrations": "कोई पंजीकरण नहीं मिला",
+    "noRegistrationsDescription": "प्रतियोगिताओं की खोज से शुरू करें"
+  },
+  "profile": {
+    "title": "प्रोफ़ाइल",
+    "settings": {
+      "bookmarks": "बुकमार्क",
+      "notifications": "अधिसूचना प्राथमिकताएं",
+      "language": "भाषा",
+      "helpSupport": "सहायता और समर्थन",
+      "about": "के बारे में",
+      "privacy": "गोपनीयता नीति",
+      "terms": "सेवा की शर्तें"
+    },
+    "editProfile": "प्रोफ़ाइल संपादित करें",
+    "section": "अनुभाग {{section}}"
+  },
+  "notifications": {
+    "title": "अधिसूचनाएं",
+    "markAllRead": "सभी पठित चिन्हित करें",
+    "today": "आज",
+    "yesterday": "कल",
+    "earlier": "पहले",
+    "noNotifications": "कोई अधिसूचना नहीं",
+    "noNotificationsDescription": "आप अपडेट हैं!"
+  },
+  "dashboard": {
+    "title": "डैशबोर्ड",
+    "totalCompetitions": "कुल प्रतियोगिताएं",
+    "totalRegistrations": "कुल पंजीकरण",
+    "verifiedRegistrations": "सत्यापित पंजीकरण",
+    "verificationRate": "सत्यापन दर",
+    "fromLastWeek": "पिछले सप्ताह से",
+    "registrationsOverTime": "समय के साथ पंजीकरण",
+    "topDepartments": "शीर्ष विभाग",
+    "recentVerified": "हाल ही में सत्यापित पंजीकरण",
+    "pendingVerifications": "लंबित सत्यापन",
+    "dateRange": "{{start}} - {{end}}",
+    "export": "निर्यात"
+  },
+  "sidebar": {
+    "dashboard": "डैशबोर्ड",
+    "competitions": "प्रतियोगिताएं",
+    "registrations": "पंजीकरण",
+    "students": "छात्र",
+    "advisors": "सलाहकार",
+    "departments": "विभाग",
+    "winners": "विजेता",
+    "analytics": "विश्लेषण",
+    "notifications": "अधिसूचनाएं",
+    "auditLogs": "ऑडिट लॉग"
+  },
+  "advisor": {
+    "title": "सलाहकार डैशबोर्ड",
+    "subtitle": "छात्र पंजीकरण प्रबंधित और सत्यापित करें",
+    "pendingVerifications": "लंबित सत्यापन",
+    "verifiedThisWeek": "इस सप्ताह सत्यापित",
+    "assignedStudents": "निर्धारित छात्र",
+    "registeredStudents": "पंजीकृत छात्र",
+    "responseTime": "प्रतिक्रिया समय",
+    "total": "कुल"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "कुछ गलत हो गया",
+    "retry": "पुनः प्रयास करें",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "confirm": "पुष्टि करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "close": "बंद करें",
+    "back": "वापस",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "sort": "क्रमबद्ध करें",
+    "export": "निर्यात",
+    "import": "आयात",
+    "noData": "कोई डेटा उपलब्ध नहीं",
+    "success": "सफल",
+    "failed": "विफल"
+  }
+}

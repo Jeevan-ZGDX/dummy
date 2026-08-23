@@ -1,0 +1,182 @@
+{
+  "app": {
+    "name": "Comp-Dash",
+    "tagline": "Discover. Participate. Achieve."
+  },
+  "auth": {
+    "login": "Sign In",
+    "loginWithGoogle": "Continue with Google",
+    "loginDescription": "Sign in with your @citchennai.net account",
+    "logout": "Sign Out",
+    "logoutConfirm": "Are you sure you want to sign out?"
+  },
+  "home": {
+    "greeting": "Hi, {{name}}",
+    "greetingEmoji": "👋",
+    "subtitle": "Here's your competition overview",
+    "verificationStatus": "Verification Status",
+    "pending": "Pending",
+    "verified": "Verified",
+    "completed": "Completed",
+    "upcomingDeadlines": "Upcoming Deadlines",
+    "viewAll": "View All",
+    "recentlyVerified": "Recently Verified",
+    "noUpcoming": "No upcoming deadlines",
+    "noVerified": "No verified competitions yet",
+    "registered": "Registered",
+    "wins": "Wins"
+  },
+  "discover": {
+    "title": "Discover",
+    "searchPlaceholder": "Search competitions...",
+    "categories": {
+      "all": "All",
+      "hackathon": "Hackathon",
+      "internship": "Internship",
+      "workshop": "Workshop",
+      "paperPresentation": "Paper Presentation",
+      "project": "Project",
+      "sports": "Sports",
+      "cultural": "Cultural",
+      "other": "Other"
+    },
+    "noResults": "No competitions found",
+    "noResultsDescription": "Try adjusting your filters or search terms",
+    "teamSize": "Team Size",
+    "prizePool": "Prize Pool",
+    "deadline": "Deadline",
+    "registerNow": "Register Now"
+  },
+  "competition": {
+    "about": "About",
+    "eligibility": "Eligibility",
+    "timeline": "Timeline",
+    "rewards": "Rewards",
+    "organizer": "Organizer",
+    "instructions": "Registration Instructions",
+    "tags": "Tags",
+    "readMore": "Read more",
+    "readLess": "Read less",
+    "share": "Share",
+    "bookmark": "Bookmark",
+    "unbookmark": "Remove Bookmark",
+    "registerNow": "Register Now",
+    "registrationClosed": "Registration Closed",
+    "national": "National",
+    "international": "International",
+    "state": "State",
+    "college": "College"
+  },
+  "history": {
+    "title": "History",
+    "tabs": {
+      "all": "All",
+      "pending": "Pending",
+      "verified": "Verified",
+      "completed": "Completed",
+      "rejected": "Rejected"
+    },
+    "registrationRequested": "Registration requested",
+    "verifiedOn": "Verified on {{date}}",
+    "noRegistrations": "No registrations found",
+    "noRegistrationsDescription": "Start by discovering competitions"
+  },
+  "profile": {
+    "title": "Profile",
+    "settings": {
+      "bookmarks": "Bookmarks",
+      "notifications": "Notification Preferences",
+      "language": "Language",
+      "helpSupport": "Help & Support",
+      "about": "About",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    },
+    "editProfile": "Edit Profile",
+    "section": "Section {{section}}"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "earlier": "Earlier",
+    "noNotifications": "No notifications",
+    "noNotificationsDescription": "You're all caught up!"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalCompetitions": "Total Competitions",
+    "totalRegistrations": "Total Registrations",
+    "verifiedRegistrations": "Verified Registrations",
+    "verificationRate": "Verification Rate",
+    "fromLastWeek": "from last week",
+    "registrationsOverTime": "Registrations Over Time",
+    "topDepartments": "Top Departments",
+    "recentVerified": "Recent Verified Registrations",
+    "pendingVerifications": "Pending Verifications",
+    "dateRange": "{{start}} - {{end}}",
+    "export": "Export"
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "competitions": "Competitions",
+    "leaderboard": "Leaderboard",
+    "notifications": "Notifications",
+    "history": "History",
+    "createCompetition": "Create Competition",
+    "roleAccess": "Role Access",
+    "registrations": "Registrations",
+    "students": "Students",
+    "advisors": "Advisors",
+    "departments": "Departments",
+    "analytics": "Analytics",
+    "winners": "Winners",
+    "auditLogs": "Audit Logs"
+  },
+  "leaderboard": {
+    "title": "Leaderboard",
+    "overall": "Overall",
+    "departmentWise": "Department-wise",
+    "competitionWise": "Competition-wise",
+    "rank": "Rank",
+    "studentName": "Student Name",
+    "department": "Department",
+    "points": "Points",
+    "competitions": "Competitions",
+    "wins": "Wins",
+    "selectDepartment": "Select Department",
+    "selectCompetition": "Select Competition",
+    "noData": "No leaderboard data available"
+  },
+  "advisor": {
+    "title": "Advisor Dashboard",
+    "subtitle": "Manage and verify student registrations",
+    "pendingVerifications": "Pending Verifications",
+    "verifiedThisWeek": "Verified This Week",
+    "assignedStudents": "Assigned Students",
+    "registeredStudents": "Registered Students",
+    "responseTime": "Response Time",
+    "total": "total"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "export": "Export",
+    "import": "Import",
+    "noData": "No data available",
+    "success": "Success",
+    "failed": "Failed"
+  }
+}

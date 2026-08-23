@@ -1,0 +1,15 @@
+{
+  "//": "Composite indexes. Firestore creates single-field indexes automatically; only multi-field queries need declaring here. Deploy with: firebase deploy --only firestore:indexes",
+  "indexes": [
+    {
+      "//": "Serves fetchNotificationsForUser: one user's rows, newest first. Without it that query throws FAILED_PRECONDITION and the code falls back to an unordered scoped read.",
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "user_id", "order": "ASCENDING" },
+        { "fieldPath": "created_at", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

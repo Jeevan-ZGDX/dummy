@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@comp-dash/design-system/*": ["packages/design-system/src/*"],
+      "@comp-dash/api/*": ["packages/api/src/*"],
+      "@comp-dash/hooks/*": ["packages/hooks/src/*"],
+      "@comp-dash/utils/*": ["packages/utils/src/*"],
+      "@comp-dash/i18n/*": ["packages/i18n/src/*"],
+      "@comp-dash/types/*": ["packages/types/src/*"],
+      "@comp-dash/config/*": ["packages/config/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "dist", "build"]
+}

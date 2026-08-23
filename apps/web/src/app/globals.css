@@ -1,0 +1,116 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #F9FAFB;
+  color: #111827;
+}
+
+html.dark body {
+  background-color: #131314;
+  color: #E3E3E3;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #333537;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4D4F51;
+}
+
+/* Table styles */
+.table-container {
+  @apply overflow-x-auto;
+}
+
+.table-container table {
+  @apply w-full;
+}
+
+.table-container th {
+  @apply text-left text-xs font-medium text-gray-500 uppercase tracking-wider px-6 py-3;
+}
+
+html.dark .table-container th {
+  @apply text-ink-muted;
+}
+
+.table-container td {
+  @apply px-6 py-4 text-sm text-gray-900;
+}
+
+html.dark .table-container td {
+  @apply text-ink-primary;
+}
+
+.table-container tr {
+  @apply border-b border-gray-100;
+}
+
+html.dark .table-container tr {
+  @apply border-obsidian-border;
+}
+
+.table-container tr:hover {
+  @apply bg-gray-50;
+}
+
+html.dark .table-container tr:hover {
+  @apply bg-obsidian-hover;
+}
+
+.table-container tr:nth-child(even) {
+  @apply bg-gray-50/50;
+}
+
+html.dark .table-container tr:nth-child(even) {
+  @apply bg-obsidian-surface/50;
+}
+
+/* No scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,147 @@
+rules_version = '2';
+
+// Firestore security rules for Comp-Dash.
+//
+// These replace what Postgres RLS used to do. They apply ONLY to the client web
+// SDK — every server route uses the Admin SDK, which bypasses rules entirely.
+// So the rule of thumb is: if a collection is only ever touched from a route
+// handler, deny all client access to it outright.
+//
+// Deploy with:  firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Mirrors the server-side domain gate. Sign-in already rejects non-college
+    // accounts, but a Firebase user could exist from another entry point.
+    function collegeUser() {
+      return signedIn()
+        && request.auth.token.email is string
+        && request.auth.token.email.matches('.*@citchennai[.]net$');
+    }
+
+    // `role` is a custom claim written server-side after the role_access lookup.
+    // A client cannot set its own claims, so this is trustworthy.
+    function hasRole(roles) {
+      return collegeUser() && request.auth.token.role in roles;
+    }
+
+    function isStaff() {
+      return hasRole(['advisor', 'hod', 'super_admin']);
+    }
+
+    function isAdmin() {
+      return hasRole(['hod', 'super_admin']);
+    }
+
+    // ─── Server-only collections ──────────────────────────────────────
+    // gmail_tokens holds live OAuth access/refresh tokens; role_access is the
+    // permission table itself. Client access to either would be a privilege
+    // escalation, so neither is readable even by an admin from the browser.
+    match /gmail_tokens/{document=**} {
+      allow read, write: if false;
+    }
+    match /role_access/{document=**} {
+      allow read, write: if false;
+    }
+    match /profiles/{document=**} {
+      allow read, write: if false;
+    }
+    match /user_profiles/{document=**} {
+      allow read, write: if false;
+    }
+    match /audit_logs/{document=**} {
+      allow read, write: if false;
+    }
+
+    // ─── Reference data ───────────────────────────────────────────────
+    // Readable by any signed-in college account; only staff may modify.
+    match /competition_dashboard/{docId} {
+      allow read: if collegeUser();
+      allow create, update, delete: if isStaff();
+    }
+
+    match /competitions/{docId} {
+      allow read: if collegeUser();
+      allow create, update, delete: if isStaff();
+    }
+
+    match /students/{docId} {
+      allow read: if collegeUser();
+      allow write: if isAdmin();
+    }
+
+    match /advisors/{docId} {
+      allow read: if collegeUser();
+      allow write: if isAdmin();
+    }
+
+    match /winners/{docId} {
+      allow read: if collegeUser();
+      allow write: if isStaff();
+    }
+
+    // Precomputed ranking rows. Readable so the UI can render them, but never
+    // client-writable: the values are derived from `winners` server-side, and a
+    // student who could edit their own row could award themselves the top spot.
+    match /leaderboard/{docId} {
+      allow read: if collegeUser();
+      allow write: if false;
+    }
+
+    // ─── Registrations ────────────────────────────────────────────────
+    // A student may create and amend their own registration; staff see and
+    // manage all of them. Verification status is deliberately NOT writable by
+    // students — approving your own registration would defeat the whole flow,
+    // so that transition is left to the server routes.
+    match /student_competitions/{docId} {
+      allow read: if isStaff()
+        || (collegeUser() && resource.data.student_email == request.auth.token.email);
+
+      allow create: if collegeUser()
+        && request.resource.data.student_email == request.auth.token.email
+        && request.resource.data.verification_status == 'pending';
+
+      allow update: if isStaff()
+        || (
+          collegeUser()
+          && resource.data.student_email == request.auth.token.email
+          && request.resource.data.verification_status == resource.data.verification_status
+        );
+
+      allow delete: if isStaff();
+    }
+
+    match /registrations/{docId} {
+      allow read: if isStaff()
+        || (collegeUser() && resource.data.user_id == request.auth.uid);
+      allow write: if isStaff();
+    }
+
+    match /verification_requests/{docId} {
+      allow read: if isStaff()
+        || (collegeUser() && resource.data.student_id == request.auth.uid);
+      allow create: if collegeUser();
+      allow update, delete: if isStaff();
+    }
+
+    // ─── Notifications ────────────────────────────────────────────────
+    match /notifications/{docId} {
+      allow read: if collegeUser() && resource.data.user_id == request.auth.uid;
+      // Only the read flag is client-writable; the rest is server-authored.
+      allow update: if collegeUser()
+        && resource.data.user_id == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['is_read']);
+      allow create, delete: if false;
+    }
+
+    // Anything not matched above is denied. Adding a collection means adding a
+    // rule for it here — silence is a closed door, not an open one.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

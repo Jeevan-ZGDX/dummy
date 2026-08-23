@@ -1,0 +1,97 @@
+# Render Blueprint — defines the production web service.
+# Deployments are triggered automatically on every push to `main`
+# (either via Render's GitHub integration or the GitHub Actions
+# workflow in .github/workflows/deploy.yml).
+#
+# Setup:
+#   1. Push this file to `main`.
+#   2. In Render, create the service via "Blueprint" (it reads render.yaml).
+#   3. Fill in the `sync: false` secrets in the Render dashboard.
+#   4. (Optional) Set the deploy hook secret in GitHub:
+#      repo Settings -> Secrets and variables -> Actions -> RENDER_DEPLOY_HOOK_URL
+#      (Render -> your service -> Deploy -> Deploy Hook)
+
+services:
+  - type: web
+    # Must match the live Render service name — it drives the
+    # <name>.onrender.com hostname. The live service is "comp-dash"
+    # (comp-dash.onrender.com); "comp-dash-web" was a separate,
+    # now-suspended service and must not be reused here.
+    name: comp-dash
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: npm ci --legacy-peer-deps && npm run build
+    startCommand: npm run start
+    # Cheap, DB-free endpoint. Using `/` here means a slow or failing page
+    # render can fail an otherwise healthy deploy.
+    healthCheckPath: /api/ping
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20.18.0
+
+      # Public, baked in at build time. NEXT_PUBLIC_* is read at BUILD time, so
+      # changing any of these requires a redeploy, not just a restart.
+      - key: NEXT_PUBLIC_API_URL
+        value: https://comp-dash.onrender.com/api
+      - key: NEXT_PUBLIC_APP_URL
+        value: https://comp-dash.onrender.com
+
+      # Firebase web config. Public by design — access is governed by Firestore
+      # security rules and Auth, never by hiding these values.
+      - key: NEXT_PUBLIC_FIREBASE_API_KEY
+        sync: false
+      - key: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+        value: compdash-bf688.firebaseapp.com
+      - key: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        value: compdash-bf688
+      - key: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+        value: compdash-bf688.firebasestorage.app
+      - key: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+        value: "186993725359"
+      - key: NEXT_PUBLIC_FIREBASE_APP_ID
+        sync: false
+      - key: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+        value: G-BZP7HG16PE
+
+      # Google OAuth for the Gmail verification flow only. Sign-in no longer
+      # uses these — Firebase Auth performs that handshake itself.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        value: https://comp-dash.onrender.com/api/auth/gmail/callback
+
+      # Webhook secret for /api/real-time/registration (private)
+      - key: REAL_TIME_API_SECRET
+        sync: false
+
+      # Firebase Admin service account (JSON string, private)
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false
+
+  - type: cron
+    name: comp-dash-cron
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: npm ci --legacy-peer-deps && npm run db:generate -w apps/web
+    startCommand: npm run cron -w apps/web
+    schedule: "0 8 * * *"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+        value: compdash-bf688
+      - key: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+        value: compdash-bf688.firebasestorage.app
+      # The cron job writes through the Admin SDK, so this is the only
+      # credential it needs.
+      - key: FIREBASE_SERVICE_ACCOUNT
+        sync: false

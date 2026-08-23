@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Department {
+  id               String   @id
+  name             String   @unique
+  fullName         String
+  studentCount     Int
+  competitionCount Int
+}
+
+model Student {
+  id                     String   @id
+  name                   String
+  email                  String   @unique
+  department             String
+  year                   String
+  section                String
+  registeredCompetitions Int
+  verifiedCompetitions   Int
+  createdAt              String
+}
+
+model Advisor {
+  id                   String   @id
+  name                 String
+  email                String   @unique
+  department           String
+  assignedSections     String
+  pendingVerifications Int
+  createdAt            String
+}
+
+model Competition {
+  id                   String   @id
+  title                String
+  description          String
+  shortDescription     String
+  category             String
+  scope                String
+  mode                 String
+  organizer            String
+  organizerLogo        String?
+  bannerUrl            String?
+  websiteUrl           String
+  registrationUrl      String
+  teamSizeMin          Int
+  teamSizeMax          Int
+  prizePool            String
+  registrationDeadline String
+  startDate            String
+  endDate              String
+  eligibility          String
+  tags                 String
+  createdAt            String
+  updatedAt            String
+}
+
+model Registration {
+  id                     String   @id
+  competitionId          String
+  userId                 String
+  status                 String
+  registeredAt           String
+  verifiedAt             String?
+  verificationMethod     String?
+  extractedConfirmationId String?
+  extractedEmail         String?
+  rejectionReason        String?
+  notes                  String?
+  createdAt              String
+  updatedAt              String
+
+  @@unique([competitionId, userId])
+}
+
+model Winner {
+  id            String @id
+  studentName   String
+  email         String
+  competition   String
+  competitionId String
+  department    String
+  position      String
+  prize         String
+  date          String
+}
+
+model AuditLog {
+  id        String @id
+  timestamp String
+  user      String
+  action    String
+  resource  String
+  details   String
+}
+
+model Notification {
+  id        String @id
+  userId    String
+  type      String
+  title     String
+  message   String
+  data      String?
+  isRead    Boolean
+  createdAt String
+}
+
+model StudentCompetition {
+  id               String @id
+  studentId        String
+  competitionId    String
+  status           String
+  section          String
+  advisorId        String?
+  verifiedAt       String?
+  verificationMethod String?
+  extractedConfirmationId String?
+  extractedEmail String?
+  rejectionReason String?
+  notes String?
+  createdAt        String
+  updatedAt        String
+
+  @@unique([studentId, competitionId])
+}
