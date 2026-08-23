@@ -40,6 +40,4 @@ export {
   useAdminAnalytics,
   useAdminAuditLogs,
 } from './hooks/useAdmin'
-export { useCompetitionSections } from './hooks/useCompetitionSections'
-export { useAdvisorCompetitionRoster } from './hooks/useAdvisorRoster'
 export { useAdvisorSummary } from './hooks/useAdvisorSummary'

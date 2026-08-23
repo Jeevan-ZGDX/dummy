@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next'
 import { Card, Badge, Button } from '@comp-dash/design-system'
 import { useCompetitions, isFirestoreEnabled } from '@comp-dash/api'
 import { getCurrentUser } from '@/lib/auth'
-import { HodYearSectionBreakdown } from '@/components/dashboard/HodYearSectionBreakdown'
 import {
   Calendar,
   MapPin,
@@ -186,8 +185,7 @@ export default function CompetitionsPage() {
               return (
                 <div
                   key={comp.id}
-                  onClick={() => router.push(`/competitions/${comp.id}`)}
-                  className="bg-white dark:bg-obsidian-surface border border-gray-200 dark:border-obsidian-border rounded-2xl overflow-hidden shadow-sm transition-all duration-200 hover:scale-[1.015] hover:border-accent/40 dark:hover:border-accent/50 cursor-pointer group flex flex-col justify-between"
+                  className="bg-white dark:bg-obsidian-surface border border-gray-200 dark:border-obsidian-border rounded-2xl overflow-hidden shadow-sm transition-all duration-200 hover:scale-[1.015] hover:border-accent/40 dark:hover:border-accent/50 group flex flex-col justify-between"
                 >
                   <div>
                     {/* Category Top Gradient Stripe */}
@@ -297,13 +295,6 @@ export default function CompetitionsPage() {
           </div>
         )}
       </div>
-
-      {/* ─── Bottom Layer: HOD Departmental Year & Section Breakdown ─────── */}
-      {isHodOrAdmin && (
-        <div className="pt-4">
-          <HodYearSectionBreakdown />
-        </div>
-      )}
     </div>
   )
 }

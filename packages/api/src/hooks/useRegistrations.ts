@@ -2,13 +2,11 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import {
   collection,
-  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
   query as fsQuery,
   setDoc,
-  updateDoc,
   where,
 } from 'firebase/firestore'
 import { apiClient } from '../client'
@@ -22,6 +20,7 @@ import type {
   DashboardStats,
   AdminRegistrationStats,
   StudentDashboardStats,
+  HodDashboardStats,
   LeaderboardEntry,
   DepartmentLeaderboardEntry,
   CompetitionDashboardData,
@@ -227,7 +226,7 @@ export function useAdvisorDashboardStats() {
 export function useHodDashboardStats() {
   return useQuery({
     queryKey: ['hod', 'dashboard', 'stats'],
-    queryFn: () => apiClient.get<StudentDashboardStats>('/hod/dashboard/stats'),
+    queryFn: () => apiClient.get<HodDashboardStats>('/hod/dashboard/stats'),
     staleTime: 5 * 60 * 1000,
   })
 }
@@ -235,7 +234,7 @@ export function useHodDashboardStats() {
 export function useCoeDashboardStats() {
   return useQuery({
     queryKey: ['coe', 'dashboard', 'stats'],
-    queryFn: () => apiClient.get<StudentDashboardStats>('/coe/dashboard/stats'),
+    queryFn: () => apiClient.get<DashboardStats>('/coe/dashboard/stats'),
     staleTime: 5 * 60 * 1000,
   })
 }
@@ -262,44 +261,6 @@ export function useCreateCompetition() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (data: Record<string, unknown>) => {
-      if (isFirestoreEnabled()) {
-        const db = getFirestoreDb()
-        if (db) {
-          try {
-            // The doc id is the row id, matching how the migration keyed every
-            // collection, so updates and deletes can address it directly.
-            const id = crypto.randomUUID()
-            await setDoc(doc(db, DASHBOARD_COLLECTION, id), {
-              id,
-              competition_name: (data.title as string) || '',
-              category: (data.category as string) || 'competition',
-              organizer: (data.organizer as string) || '',
-              total_prize_amount: (data.prizePool as string) || '',
-              website_url: (data.registrationUrl as string) || (data.websiteUrl as string) || '',
-              registration_link: (data.registrationLink as string) || '',
-              description: (data.description as string) || '',
-              short_description: (data.shortDescription as string) || '',
-              scope: (data.scope as string) || 'national',
-              mode: (data.mode as string) || 'online',
-              organizer_email: (data.organizerEmail as string) || '',
-              team_size_min: (data.teamSizeMin as number) ?? 1,
-              team_size_max: (data.teamSizeMax as number) ?? 1,
-              tags: data.tags ? (typeof data.tags === 'string' ? data.tags : JSON.stringify(data.tags)) : '[]',
-              reg_deadline: (data.registrationDeadline as string) || null,
-              r1_date: (data.startDate as string) || null,
-              r2_date: (data.endDate as string) || null,
-              eligible_year: ((data.eligibility as Record<string, unknown>)?.yearOfStudy as string[])?.[0] || '',
-              competition_status: 'On Going',
-              serial_no: Math.floor(Date.now() / 1000),
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            })
-          } catch (err) {
-            console.warn('Direct Firestore client setDoc skipped/failed, relying on API endpoint:', err)
-          }
-        }
-      }
-
       const result = await apiClient.post('/competitions', data)
       return result
     },
@@ -314,36 +275,6 @@ export function useUpdateCompetition() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: Record<string, unknown> }) => {
-      if (isFirestoreEnabled()) {
-        const db = getFirestoreDb()
-        if (!db) throw new Error('Firestore not configured')
-        const updates: Record<string, unknown> = {}
-        if (data.title !== undefined) updates.competition_name = data.title as string
-        if (data.description !== undefined) updates.description = data.description as string
-        if (data.shortDescription !== undefined) updates.short_description = data.shortDescription as string
-        if (data.category !== undefined) updates.category = data.category as string
-        if (data.scope !== undefined) updates.scope = data.scope as string
-        if (data.mode !== undefined) updates.mode = data.mode as string
-        if (data.organizer !== undefined) updates.organizer = data.organizer as string
-        if (data.organizerEmail !== undefined) updates.organizer_email = data.organizerEmail as string
-        if (data.prizePool !== undefined) updates.total_prize_amount = data.prizePool as string
-        if (data.teamSizeMin !== undefined) updates.team_size_min = data.teamSizeMin as number
-        if (data.teamSizeMax !== undefined) updates.team_size_max = data.teamSizeMax as number
-        if (data.registrationUrl !== undefined) updates.website_url = data.registrationUrl as string
-        else if (data.websiteUrl !== undefined) updates.website_url = data.websiteUrl as string
-        if (data.registrationLink !== undefined) updates.registration_link = data.registrationLink as string
-        if (data.tags !== undefined) updates.tags = JSON.stringify(data.tags)
-        if (data.registrationDeadline !== undefined) updates.reg_deadline = (data.registrationDeadline as string) || null
-        if (data.startDate !== undefined) updates.r1_date = (data.startDate as string) || null
-        if (data.endDate !== undefined) updates.r2_date = (data.endDate as string) || null
-        if (data.eligibility !== undefined) {
-          updates.eligible_year = ((data.eligibility as Record<string, unknown>)?.yearOfStudy as string[])?.[0] || ''
-        }
-        updates.updated_at = new Date().toISOString()
-        await updateDoc(doc(db, DASHBOARD_COLLECTION, id), updates)
-        return { id, ...data } as Record<string, unknown>
-      }
-
       const result = await apiClient.put(`/competitions/${id}`, data)
       return result
     },
@@ -358,13 +289,6 @@ export function useDeleteCompetition() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      if (isFirestoreEnabled()) {
-        const db = getFirestoreDb()
-        if (!db) throw new Error('Firestore not configured')
-        await deleteDoc(doc(db, DASHBOARD_COLLECTION, id))
-        return id
-      }
-
       return apiClient.delete(`/competitions/${id}`)
     },
     onSuccess: () => {

@@ -158,17 +158,12 @@ export function parseEligibleYears(eligible: string | null | undefined): ParsedE
 /**
  * Academic years the dashboards actually report on.
  *
- * `students` only holds two cohorts — "1st Year" (batch 2025) and "3rd Year"
- * (batch 2024) — and only the 3rd-year cohort has advisor mappings and
- * registration activity. Scoping to it also avoids a real ambiguity: 1st-year
- * sections are stored bare ("A") while 3rd-year ones carry a prefix ("3%A"),
- * and both normalize to "A". Counting them together double-counts every
- * section (A became 127 instead of 65).
- *
+ * `students` holds two cohorts — "2nd Year" (batch 2025) and "3rd Year"
+ * (batch 2024). Both have registration activity, so both are included.
  * Widen this list when another cohort gets real data; every year filter reads
  * from here so there is one place to change.
  */
-export const ACTIVE_YEAR_NUMBERS: readonly number[] = [3]
+export const ACTIVE_YEAR_NUMBERS: readonly number[] = [2, 3]
 
 /** `students.year` labels for the active cohorts. */
 export const ACTIVE_YEAR_LABELS: readonly string[] = ACTIVE_YEAR_NUMBERS.map(yearNumberToLabel)

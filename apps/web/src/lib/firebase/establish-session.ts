@@ -6,6 +6,7 @@ export interface SessionResult {
   ok: boolean
   error?: string
   code?: string
+  role?: string
 }
 
 async function postToken(idToken: string) {
@@ -44,7 +45,7 @@ export async function establishSession(user: User): Promise<SessionResult> {
       }
     }
 
-    return { ok: true }
+    return { ok: true, role: data.profile?.role }
   } catch (err) {
     return { ok: false, error: (err as Error).message || 'Network error while signing in.' }
   }

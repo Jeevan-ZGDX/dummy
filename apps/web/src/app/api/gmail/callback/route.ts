@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
     const verifyResponse = await fetch(verifyUrl.toString(), { method: 'POST' })
     const verifyData = await verifyResponse.json()
 
-    const redirectUrl = new URL(`/competitions/${competitionId}`, request.url)
+    const redirectUrl = new URL('/competitions', request.url)
     redirectUrl.searchParams.set('verified', 'true')
     redirectUrl.searchParams.set('status', verifyData.verified ? 'success' : 'not_found')
     return NextResponse.redirect(redirectUrl)

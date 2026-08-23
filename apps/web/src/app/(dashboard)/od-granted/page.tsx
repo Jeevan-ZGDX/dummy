@@ -31,7 +31,7 @@ interface VerifiedStudent {
 
 type FilterTag = { type: 'name' | 'email' | 'competition'; value: string }
 
-export default function VerifiedStudentsPage() {
+export default function ODGrantedPage() {
   const router = useRouter()
   const [user, setUser] = useState<any>(null)
   const [verified, setVerified] = useState<VerifiedStudent[]>([])
@@ -144,8 +144,8 @@ export default function VerifiedStudentsPage() {
       }))
       const ws = XLSX.utils.json_to_sheet(rows)
       const wb = XLSX.utils.book_new()
-      XLSX.utils.book_append_sheet(wb, ws, 'Verified Students')
-      XLSX.writeFile(wb, `verified-students-${new Date().toISOString().split('T')[0]}.xlsx`)
+      XLSX.utils.book_append_sheet(wb, ws, 'OD Granted')
+      XLSX.writeFile(wb, `od-granted-${new Date().toISOString().split('T')[0]}.xlsx`)
     } catch (e) {
       console.error('Export failed:', e)
     } finally {
@@ -157,7 +157,7 @@ export default function VerifiedStudentsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-ink-primary">Verified Students</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-ink-primary">OD Granted</h1>
           <p className="text-gray-500 mt-1 dark:text-obsidian-faint">
             {user?.role === 'student'
               ? 'Your verified submissions with email proof metadata'

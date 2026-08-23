@@ -60,6 +60,17 @@ async function fetchFromFirestore<T>(collectionName: string, filters?: Record<st
   const snap = await getDocs(fsQuery(collection(db, DASHBOARD_COLLECTION), ...constraints))
   let rows = snap.docs.map(toRow)
 
+  // Deduplicate by competition name + organizer (keeps the latest by serial_no)
+  const seen = new Map<string, any>()
+  for (const row of rows) {
+    const key = `${String(row.competition_name || '').trim().toLowerCase()}|${String(row.organizer || '').trim().toLowerCase()}`
+    const existing = seen.get(key)
+    if (!existing || (row.serial_no ?? 0) > (existing.serial_no ?? 0)) {
+      seen.set(key, row)
+    }
+  }
+  rows = Array.from(seen.values())
+
   if (filters?.search) {
     const needle = String(filters.search).toLowerCase()
     rows = rows.filter((r) => matchesSearch(r, needle))

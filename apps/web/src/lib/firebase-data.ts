@@ -42,6 +42,7 @@ export const winners: any[] = []
 export const auditLogs: any[] = []
 export const notifications: any[] = []
 export const verificationRequests: any[] = []
+export const odRequests: any[] = []
 
 let loaded = false
 
@@ -223,6 +224,16 @@ export async function pushNotifications(items: any[]) {
 export async function pushVerificationRequest(item: any) {
   verificationRequests.push(item)
   await upsertVerificationRequest(item)
+  persistToStorage()
+}
+
+export async function pushOdRequest(item: any) {
+  const existingIdx = odRequests.findIndex(od => od.id === item.id)
+  if (existingIdx >= 0) {
+    odRequests[existingIdx] = item
+  } else {
+    odRequests.push(item)
+  }
   persistToStorage()
 }
 

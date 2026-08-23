@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Comp-Dash
 
 A production-grade mobile-first SaaS platform for college competition management.
@@ -275,3 +276,6 @@ EXPO_PUBLIC_API_URL=http://localhost:3001/api
 ## License
 
 Private - All rights reserved.
+=======
+# dummy
+>>>>>>> f3d04b91a9828015bd1932f3919d7985b3d8b9bf

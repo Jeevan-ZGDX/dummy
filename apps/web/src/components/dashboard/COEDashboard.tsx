@@ -3,7 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { Card, CardHeader, CardTitle, StatCard, Button, Badge } from '@comp-dash/design-system'
 import { useCoeDashboardStats, useCompetitions } from '@comp-dash/api'
-import { Trophy, Users, UserCheck, UserCog, Building2, Plus, Calendar, ExternalLink, Mail, Send } from 'lucide-react'
+import { Trophy, Users, UserCheck, UserCog, Plus, ExternalLink, Mail } from 'lucide-react'
+import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts'
+
+const PIE_COLORS = ['#2563eb', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4']
 
 export default function COEDashboard() {
   const router = useRouter()
@@ -24,15 +27,40 @@ export default function COEDashboard() {
   }
 
   const competitions = compsData?.data ?? []
-  const registrations = stats?.registrations ?? []
 
-  const deptCounts: Record<string, number> = {}
-  registrations.forEach((r) => {
-    const dept = r.department || r.competition?.title || 'Unknown'
-    deptCounts[dept] = (deptCounts[dept] || 0) + 1
-  })
-  const deptData = Object.entries(deptCounts).map(([department, count]) => ({ department, count }))
-  const maxDeptCount = Math.max(...deptData.map((d) => d.count), 1)
+  const totalVerified = stats?.verifiedRegistrations ?? 0
+  const totalPending = stats?.pendingRegistrations ?? 0
+  const totalRejected = stats?.rejectedRegistrations ?? 0
+  const registered = stats?.registered ?? 0
+  const totalExpected = stats?.totalExpected ?? 0
+  const unregistered = stats?.unregistered ?? 0
+
+  // Pie chart data: registration distribution
+  const pieData = [
+    { name: 'Registered', value: registered },
+    { name: 'Unregistered', value: unregistered },
+  ].filter(d => d.value > 0)
+
+  // Status breakdown pie data
+  const statusPieData = [
+    { name: 'Verified', value: totalVerified },
+    { name: 'Pending', value: totalPending },
+    { name: 'Rejected', value: totalRejected },
+  ].filter(d => d.value > 0)
+
+  // Trend data for line chart
+  const trendData = stats?.registrationsOverTime ?? []
+  const verificationTrendData = stats?.verificationTrend ?? []
+
+  // Merge trend data for combined chart
+  const mergedTrendData = trendData.map((item, i) => ({
+    month: item.date,
+    registrations: item.count,
+    verifications: verificationTrendData[i]?.count ?? 0,
+  }))
+
+  // Department bar data
+  const topDepartments = stats?.topDepartments ?? []
 
   return (
     <div className="space-y-6">
@@ -51,74 +79,140 @@ export default function COEDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Total Competitions"
-          value={compsData?.total ?? competitions.length}
+          title="Open Competitions"
+          value={stats?.openCompetitions ?? 0}
           icon={<Trophy className="w-5 h-5" />}
         />
         <StatCard
-          title="Total Students"
-          value={stats?.totalRegistered || 0}
-          icon={<Users className="w-5 h-5" />}
-        />
-        <StatCard
-          title="Total Registrations"
-          value={registrations.length}
+          title="Registered"
+          value={registered}
           icon={<UserCheck className="w-5 h-5" />}
         />
         <StatCard
-          title="Total Advisors"
-          value={0}
-          icon={<UserCog className="w-5 h-5" />}
+          title="Unregistered"
+          value={unregistered}
+          icon={<Users className="w-5 h-5" />}
+        />
+        <StatCard
+          title="Total Expected"
+          value={totalExpected}
+          icon={<Trophy className="w-5 h-5" />}
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Verification Requests</CardTitle>
+            <CardTitle>Registration Distribution</CardTitle>
           </CardHeader>
-          <div className="mt-4 space-y-2">
-            {(stats?.selfVerificationRequests?.length ?? 0) > 0 ? (
-              stats!.selfVerificationRequests.map((vr: any) => (
-                <div key={vr.id} className="px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">{vr.studentName}</span>
-                    <Badge variant="info" size="sm">Pending</Badge>
-                  </div>
-                  <p className="text-xs text-gray-500">{vr.department} · {vr.competitionTitle}</p>
-                </div>
-              ))
+          <div className="mt-4 h-64">
+            {pieData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={3}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {pieData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
             ) : (
-              <div className="px-4 py-6 text-center">
-                <Mail className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm text-gray-400">No pending requests</p>
-              </div>
+              <div className="flex items-center justify-center h-full text-gray-400 text-sm">No data</div>
             )}
           </div>
         </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Registrations by Department</CardTitle>
+            <CardTitle>Verification Status</CardTitle>
+          </CardHeader>
+          <div className="mt-4 h-64">
+            {statusPieData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={statusPieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={3}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {statusPieData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-400 text-sm">No data</div>
+            )}
+          </div>
+        </Card>
+      </div>
+
+      {mergedTrendData.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Registration & Verification Trend</CardTitle>
+          </CardHeader>
+          <div className="mt-4 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={mergedTrendData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="registrations" stroke="#2563eb" strokeWidth={2} dot={{ r: 4 }} />
+                <Line type="monotone" dataKey="verifications" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Departments</CardTitle>
           </CardHeader>
           <div className="mt-4 space-y-3">
-            {deptData.length > 0 ? (
-              deptData.map((dept) => (
-                <div key={dept.department} className="space-y-1">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-700 font-medium">{dept.department}</span>
-                    <span className="text-gray-500">{dept.count}</span>
+            {topDepartments.length > 0 ? (
+              topDepartments.map((dept) => {
+                const maxCount = Math.max(...topDepartments.map(d => d.count), 1)
+                return (
+                  <div key={dept.name} className="space-y-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-700 font-medium">{dept.name}</span>
+                      <span className="text-gray-500">{dept.count}</span>
+                    </div>
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-accent rounded-full transition-all duration-500"
+                        style={{ width: `${(dept.count / maxCount) * 100}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-accent rounded-full transition-all duration-500"
-                      style={{ width: `${(dept.count / maxDeptCount) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))
+                )
+              })
             ) : (
-              <div className="text-center py-8 text-gray-500 text-sm">No registration data</div>
+              <div className="text-center py-8 text-gray-500 text-sm">No data</div>
             )}
           </div>
         </Card>
@@ -132,8 +226,7 @@ export default function COEDashboard() {
               competitions.map((comp) => (
                 <div
                   key={comp.id}
-                  className="flex items-center justify-between px-4 py-3 rounded-xl hover:cursor-pointer transition-colors"
-                  onClick={() => router.push(`/competitions/${comp.id}`)}
+                  className="flex items-center justify-between px-4 py-3 rounded-xl transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">
@@ -159,6 +252,30 @@ export default function COEDashboard() {
           </div>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Verification Requests</CardTitle>
+        </CardHeader>
+        <div className="mt-4 space-y-2">
+          {(stats?.selfVerificationRequests?.length ?? 0) > 0 ? (
+            stats!.selfVerificationRequests.map((vr: any) => (
+              <div key={vr.id} className="px-4 py-3 bg-blue-50 border border-blue-100 rounded-xl">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-gray-900">{vr.studentName}</span>
+                  <Badge variant="info" size="sm">Pending</Badge>
+                </div>
+                <p className="text-xs text-gray-500">{vr.department} · {vr.competitionTitle}</p>
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-6 text-center">
+              <Mail className="w-8 h-8 mx-auto mb-2 text-gray-300" />
+              <p className="text-sm text-gray-400">No pending requests</p>
+            </div>
+          )}
+        </div>
+      </Card>
     </div>
   )
 }

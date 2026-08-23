@@ -3,9 +3,9 @@ export const dynamic = 'force-dynamic'
 import { NextRequest, NextResponse } from 'next/server'
 import {
   departments, students, advisors, competitions, registrations,
-  winners, auditLogs, notifications, verificationRequests,
+  winners, auditLogs, notifications, verificationRequests, odRequests,
   ensureLoaded, pushRegistration, pushNotification, pushNotifications,
-  pushVerificationRequest, pushWinner, pushStudent, pushAdvisor,
+  pushVerificationRequest, pushOdRequest, pushWinner, pushStudent, pushAdvisor,
   pushCompetition, syncRegistration, syncVerificationRequests, syncNotifications,
   persistToStorage,
 } from '@/lib/firebase-data'
@@ -22,7 +22,7 @@ import {
 import { COLLECTIONS } from '@/lib/firebase/config'
 import { storeGmailTokens, getValidAccessToken as getValidGmailAccessToken, getGmailTokens, clearGmailTokens } from '@/lib/gmail-tokens'
 import type { UserRole } from '@/lib/auth'
-import { normalizeSection, sectionMatches } from '@comp-dash/utils'
+import { normalizeSection, sectionMatches, ACTIVE_YEAR_LABELS } from '@comp-dash/utils'
 import { getSessionUser } from '@/lib/firebase/server-session'
 import { refreshStudentLeaderboard, LEADERBOARD_TAG } from '@/lib/leaderboard'
 import { revalidateTag } from 'next/cache'
@@ -142,7 +142,17 @@ function filterAdvisors(list: typeof advisors, qs: URLSearchParams) {
 }
 
 function filterComps(list: typeof competitions, qs: URLSearchParams) {
-  let result = [...list]
+  // Deduplicate by title + organizer (keeps the latest by createdAt)
+  const deduped = new Map<string, any>()
+  for (const c of list) {
+    const key = `${(c.title || '').trim().toLowerCase()}|${(c.organizer || '').trim().toLowerCase()}`
+    const existing = deduped.get(key)
+    if (!existing || new Date(c.createdAt || 0).getTime() > new Date(existing.createdAt || 0).getTime()) {
+      deduped.set(key, c)
+    }
+  }
+  let result = Array.from(deduped.values())
+
   const cat = qs.get('category')
   if (cat) result = result.filter(c => c.category === cat)
   const s = qs.get('search')?.toLowerCase()
@@ -165,6 +175,25 @@ function buildRegistrationsOverTime(): { date: string; count: number }[] {
     const ts = reg.registeredAt || reg.createdAt
     if (!ts) continue
     const d = new Date(ts)
+    if (isNaN(d.getTime())) continue
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    buckets.set(key, (buckets.get(key) || 0) + 1)
+  }
+  const now = new Date()
+  const result: { date: string; count: number }[] = []
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    result.push({ date: key, count: buckets.get(key) || 0 })
+  }
+  return result
+}
+
+function buildVerificationTrend(): { date: string; count: number }[] {
+  const buckets = new Map<string, number>()
+  for (const reg of registrations) {
+    if (!reg.verifiedAt) continue
+    const d = new Date(reg.verifiedAt)
     if (isNaN(d.getTime())) continue
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
     buckets.set(key, (buckets.get(key) || 0) + 1)
@@ -361,17 +390,87 @@ register('POST', '/competitions', async (req) => {
   }
   await pushCompetition(newCompetition)
 
-  const notifItems = students.map(s => ({
-    id: 'notif-' + Date.now() + '-' + s.id,
+  // ─── Notifications (fire-and-forget) ──────────────────────────────────
+  // Send to eligible students and all advisors. Duplicate guard: skip any
+  // user who already has a notification for this competition.
+  const notifDeadline = registrationDeadline
+    ? new Date(registrationDeadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : 'TBA'
+
+  const existingNotifs = new Set(
+    notifications
+      .filter(n => n.data?.competitionId === newCompetition.id)
+      .map(n => n.userId)
+  )
+
+  // Students: filter by eligibility (departments / yearOfStudy)
+  const eligibleStudents = students.filter(s => {
+    if (existingNotifs.has(s.id)) return false
+    const elig = eligibility as { departments?: string[]; yearOfStudy?: string[] } | undefined
+    if (elig?.departments?.length && !elig.departments.includes(s.department)) return false
+    if (elig?.yearOfStudy?.length && !elig.yearOfStudy.includes(s.year)) return false
+    return true
+  })
+
+  const categoryLabel = category.charAt(0).toUpperCase() + category.slice(1).replace(/_/g, ' ')
+
+  const studentNotifs = eligibleStudents.map(s => ({
+    id: 'notif-' + Date.now() + '-stu-' + s.id,
     userId: s.id,
-    type: 'new_competition',
-    title: 'New Competition Added',
-    message: `${title} has been added. Check it out now!`,
-    data: { competitionId: newCompetition.id, competitionTitle: title },
+    type: 'new_competition' as const,
+    title: 'New Competition Available',
+    message: `A new ${categoryLabel} competition "${title}" has been published. Registration deadline: ${notifDeadline}. View details and register now!`,
+    data: { competitionId: newCompetition.id, competitionTitle: title, category, deadline: registrationDeadline },
     isRead: false,
     createdAt: new Date().toISOString(),
   }))
-  await pushNotifications(notifItems)
+
+  // Advisors: all advisors get notified
+  const advisorNotifs = advisors
+    .filter(a => !existingNotifs.has(a.id))
+    .map(a => ({
+      id: 'notif-' + Date.now() + '-adv-' + a.id,
+      userId: a.id,
+      type: 'new_competition' as const,
+      title: 'New Competition Published',
+      message: `A new ${categoryLabel} competition "${title}" is now open for registrations. Deadline: ${notifDeadline}. Students in your sections may be eligible.`,
+      data: { competitionId: newCompetition.id, competitionTitle: title, category, deadline: registrationDeadline },
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    }))
+
+  const allNotifs = [...studentNotifs, ...advisorNotifs]
+  if (allNotifs.length > 0) {
+    pushNotifications(allNotifs).catch(err => console.error('Competition notification push failed:', err))
+  }
+
+  // ─── Deadline reminders (fire-and-forget) ─────────────────────────────
+  // Schedule reminders 3 days before the registration deadline using BullMQ.
+  if (registrationDeadline) {
+    const deadline = new Date(registrationDeadline)
+    const reminderDate = new Date(deadline.getTime() - 3 * 24 * 60 * 60 * 1000)
+    const delayMs = reminderDate.getTime() - Date.now()
+
+    if (delayMs > 0) {
+      import('@/lib/redis-queue').then(({ competitionQueue }) => {
+        return competitionQueue.add(
+          'deadline-reminder',
+          {
+            competitionId: newCompetition.id,
+            competitionTitle: title,
+            category,
+            registrationDeadline,
+          },
+          {
+            delay: delayMs,
+            jobId: `reminder-${newCompetition.id}`,
+            removeOnComplete: true,
+            removeOnFail: false,
+          }
+        )
+      }).catch(err => console.error('Failed to schedule deadline reminder:', err))
+    }
+  }
 
   return ok(newCompetition)
 })
@@ -833,6 +932,173 @@ register('PATCH', '/verification-requests/:id/verify', async (req, seg) => {
   return ok(verificationRequests[idx])
 })
 
+// ─── OD REQUESTS ─────────────────────────────────────────────────────
+register('GET', '/od-requests', async (req) => {
+  const qs = new URL(req.url).searchParams
+  const userId = qs.get('userId')
+  const role = qs.get('role')
+  const page = parseInt(qs.get('page') || '1')
+  const limit = parseInt(qs.get('limit') || '10')
+
+  let filtered = [...odRequests]
+  if (userId) {
+    if (role === 'student') {
+      filtered = filtered.filter(od => od.studentId === userId)
+    } else if (role === 'advisor') {
+      const deptStudents = students.filter(s => s.department === (students.find(s => s.id === userId)?.department || ''))
+      const deptStudentIds = new Set(deptStudents.map(s => s.id))
+      filtered = filtered.filter(od => deptStudentIds.has(od.studentId))
+    }
+  }
+  filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  return ok(paginated(filtered, page, limit))
+})
+
+register('POST', '/od-requests', async (req) => {
+  const body = await req.json()
+  const { competitionId, studentId } = body
+  if (!competitionId || !studentId) {
+    return NextResponse.json({ success: false, error: { code: 'BAD_REQUEST', message: 'competitionId and studentId required' } }, { status: 400 })
+  }
+  const student = students.find(s => s.id === studentId)
+  if (!student) {
+    return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'Student not found' } }, { status: 404 })
+  }
+  const competition = competitions.find(c => c.id === competitionId)
+  if (!competition) {
+    return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'Competition not found' } }, { status: 404 })
+  }
+
+  // Check if OD request already exists for this student + competition
+  const existing = odRequests.find(od => od.studentId === studentId && od.competitionId === competitionId)
+  if (existing) {
+    if (existing.status === 'cancelled') {
+      // Allow re-requesting if previously cancelled
+      const idx = odRequests.indexOf(existing)
+      const now = new Date().toISOString()
+      odRequests[idx] = { ...existing, status: 'requested', requestedAt: now, reviewedAt: null, reviewedBy: null, rejectionReason: null, updatedAt: now }
+      await pushOdRequest(odRequests[idx])
+      return ok(odRequests[idx])
+    }
+    return ok({ ...existing, alreadyRequested: true })
+  }
+
+  // Find the student's advisor (by department match)
+  const advisor = advisors.find(a => a.department === student.department) || { id: 'adv-1', name: 'Faculty Advisor' }
+
+  const now = new Date().toISOString()
+  const newOdRequest = {
+    id: 'od-' + Date.now(),
+    studentId,
+    studentName: student.name,
+    studentEmail: student.email,
+    competitionId,
+    competitionTitle: competition.title,
+    section: student.section || '',
+    department: student.department,
+    advisorId: advisor.id,
+    advisorName: advisor.name,
+    status: 'requested',
+    requestedAt: now,
+    reviewedAt: null,
+    reviewedBy: null,
+    rejectionReason: null,
+    createdAt: now,
+    updatedAt: now,
+  }
+  await pushOdRequest(newOdRequest as any)
+
+  // Notify advisor
+  await pushNotification({
+    id: 'notif-' + Date.now(),
+    userId: advisor.id,
+    type: 'od_request',
+    title: 'New OD Request',
+    message: `${student.name} has requested OD approval for ${competition.title}.`,
+    data: { odRequestId: newOdRequest.id, studentId, competitionId },
+    isRead: false,
+    createdAt: now,
+  })
+
+  return ok(newOdRequest)
+})
+
+register('PATCH', '/od-requests/:id/approve', async (req, seg) => {
+  const id = seg[1]
+  const idx = odRequests.findIndex(od => od.id === id)
+  if (idx === -1) {
+    return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'OD request not found' } }, { status: 404 })
+  }
+  const od = odRequests[idx]
+  if (od.status !== 'requested') {
+    return NextResponse.json({ success: false, error: { code: 'BAD_REQUEST', message: `Cannot approve OD request in status: ${od.status}` } }, { status: 400 })
+  }
+  const now = new Date().toISOString()
+  odRequests[idx] = { ...od, status: 'approved', reviewedAt: now, reviewedBy: 'advisor', updatedAt: now }
+  await pushOdRequest(odRequests[idx])
+
+  // Notify student
+  await pushNotification({
+    id: 'notif-' + Date.now(),
+    userId: od.studentId,
+    type: 'od_request',
+    title: 'OD Request Approved',
+    message: `Your OD request for ${od.competitionTitle} has been approved.`,
+    data: { odRequestId: id, status: 'approved' },
+    isRead: false,
+    createdAt: now,
+  })
+
+  return ok(odRequests[idx])
+})
+
+register('PATCH', '/od-requests/:id/reject', async (req, seg) => {
+  const id = seg[1]
+  const body = await req.json().catch(() => ({}))
+  const idx = odRequests.findIndex(od => od.id === id)
+  if (idx === -1) {
+    return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'OD request not found' } }, { status: 404 })
+  }
+  const od = odRequests[idx]
+  if (od.status !== 'requested') {
+    return NextResponse.json({ success: false, error: { code: 'BAD_REQUEST', message: `Cannot reject OD request in status: ${od.status}` } }, { status: 400 })
+  }
+  const now = new Date().toISOString()
+  odRequests[idx] = { ...od, status: 'rejected', reviewedAt: now, reviewedBy: 'advisor', rejectionReason: body.reason || null, updatedAt: now }
+  await pushOdRequest(odRequests[idx])
+
+  // Notify student
+  await pushNotification({
+    id: 'notif-' + Date.now(),
+    userId: od.studentId,
+    type: 'od_request',
+    title: 'OD Request Rejected',
+    message: `Your OD request for ${od.competitionTitle} has been rejected.${body.reason ? ` Reason: ${body.reason}` : ''}`,
+    data: { odRequestId: id, status: 'rejected' },
+    isRead: false,
+    createdAt: now,
+  })
+
+  return ok(odRequests[idx])
+})
+
+register('PATCH', '/od-requests/:id/cancel', async (req, seg) => {
+  const id = seg[1]
+  const idx = odRequests.findIndex(od => od.id === id)
+  if (idx === -1) {
+    return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'OD request not found' } }, { status: 404 })
+  }
+  const od = odRequests[idx]
+  if (od.status !== 'requested') {
+    return NextResponse.json({ success: false, error: { code: 'BAD_REQUEST', message: `Cannot cancel OD request in status: ${od.status}` } }, { status: 400 })
+  }
+  const now = new Date().toISOString()
+  odRequests[idx] = { ...od, status: 'cancelled', updatedAt: now }
+  await pushOdRequest(odRequests[idx])
+
+  return ok(odRequests[idx])
+})
+
 // ─── NOTIFICATIONS ───────────────────────────────────────────────────
 register('GET', '/notifications', async (req) => {
   const qs = new URL(req.url).searchParams
@@ -891,18 +1157,39 @@ register('GET', '/hod/dashboard/stats', async (req) => {
   const userId = qs.get('userId') || 'user-hod'
   const user = students.find(s => s.id === userId) || { id: userId, name: 'HOD User', department: 'CSE' }
   const deptName = user.department || 'CSE'
-  const deptStudents = students.filter(s => s.department === deptName)
+  const now = new Date()
+
+  const deptStudents = students.filter(s => s.department === deptName && ACTIVE_YEAR_LABELS.includes(s.year))
   const deptRegistrations = registrations.filter(r => deptStudents.some(s => s.id === r.userId))
+
+  // Open competitions: registration deadline is empty or still in the future
+  const openCompetitions = competitions.filter(c => {
+    if (c.registrationDeadline) {
+      const deadline = new Date(c.registrationDeadline)
+      if (!isNaN(deadline.getTime()) && deadline <= now) return false
+    }
+    return true
+  })
+
+  // Total Expected = openComps × dept eligible students
+  const totalExpected = openCompetitions.length * deptStudents.length
+  const registered = deptRegistrations.length
+  const unregistered = Math.max(totalExpected - registered, 0)
+
   const verifiedCount = deptRegistrations.filter(r => r.status === 'verified' || r.status === 'completed').length
   const pendingCount = deptRegistrations.filter(r => r.status === 'pending_verification').length
   const rejectedCount = deptRegistrations.filter(r => r.status === 'rejected').length
-  const yearWise = ['1st Year', '2nd Year', '3rd Year', '4th Year'].map(year => {
+
+  const yearWise = ['2nd Year', '3rd Year'].map(year => {
     const yearStudents = deptStudents.filter(s => s.year === year)
     const yearRegs = deptRegistrations.filter(r => yearStudents.some(s => s.id === r.userId))
+    const yearExpected = openCompetitions.length * yearStudents.length
     return {
       year,
       studentCount: yearStudents.length,
       registrationCount: yearRegs.length,
+      totalExpected: yearExpected,
+      unregistered: Math.max(yearExpected - yearRegs.length, 0),
       verifiedCount: yearRegs.filter(r => r.status === 'verified' || r.status === 'completed').length,
       pendingCount: yearRegs.filter(r => r.status === 'pending_verification').length,
     }
@@ -919,7 +1206,10 @@ register('GET', '/hod/dashboard/stats', async (req) => {
 
   return ok({
     totalStudents: deptStudents.length,
-    registeredCount: deptRegistrations.length,
+    openCompetitions: openCompetitions.length,
+    totalExpected,
+    registered,
+    unregistered,
     verifiedCount,
     pendingCount,
     rejectedCount,
@@ -976,17 +1266,62 @@ register('GET', '/advisor/dashboard/stats', async (req) => {
 
 // ─── COE DASHBOARD ──────────────────────────────────────────────────────
 register('GET', '/coe/dashboard/stats', async () => {
-  const totalCompetitions = competitions.length
+  const now = new Date()
+
+  // Open competitions: registration deadline is empty or still in the future
+  const openCompetitions = competitions.filter(c => {
+    if (c.registrationDeadline) {
+      const deadline = new Date(c.registrationDeadline)
+      if (!isNaN(deadline.getTime()) && deadline <= now) return false
+    }
+    return true
+  })
+
+  // Eligible students: active year cohorts only (2nd/3rd year)
+  // A student is excluded if every open competition restricts departments
+  // and none match the student's department.
+  const eligibleStudents = students.filter(s => {
+    if (!ACTIVE_YEAR_LABELS.includes(s.year)) return false
+    return true
+  })
+
+  const totalExpected = openCompetitions.length * eligibleStudents.length
+
   const totalRegistrations = registrations.length
+  const registered = totalRegistrations
+  const unregistered = Math.max(totalExpected - registered, 0)
+
   const verifiedRegistrations = registrations.filter(r => r.status === 'verified' || r.status === 'completed').length
-  const verificationRate = totalRegistrations > 0 ? Math.round((verifiedRegistrations / totalRegistrations) * 100) : 0
+  const pendingRegistrations = registrations.filter(r => r.status === 'pending_verification').length
+  const rejectedRegistrations = registrations.filter(r => r.status === 'rejected').length
+  const verificationRate = registered > 0 ? Math.round((verifiedRegistrations / registered) * 100) : 0
+
   const registrationsOverTime = buildRegistrationsOverTime()
+  const verificationTrend = buildVerificationTrend()
+
   const topDepartments = departments.map(d => ({ name: d.name, count: countDepartmentRegistrations(d.name) })).sort((a, b) => b.count - a.count).slice(0, 5)
   const recentVerified = registrations.filter(r => r.verifiedAt).sort((a, b) => new Date(b.verifiedAt!).getTime() - new Date(a.verifiedAt!).getTime()).slice(0, 5)
   const pendingVerifications = registrations.filter(r => r.status === 'pending_verification').slice(0, 5)
   const selfVerificationRequests = verificationRequests.filter(v => v.status === 'pending').slice(0, 5)
 
-  return ok({ totalCompetitions, totalRegistrations, verifiedRegistrations, verificationRate, registrationsOverTime, topDepartments, recentVerified, pendingVerifications, selfVerificationRequests })
+  return ok({
+    totalCompetitions: competitions.length,
+    openCompetitions: openCompetitions.length,
+    totalRegistered: registered,
+    registered,
+    totalExpected,
+    unregistered,
+    verifiedRegistrations,
+    pendingRegistrations,
+    rejectedRegistrations,
+    verificationRate,
+    registrationsOverTime,
+    verificationTrend,
+    topDepartments,
+    recentVerified,
+    pendingVerifications,
+    selfVerificationRequests,
+  })
 })
 
 // ─── STUDENT DASHBOARD ──────────────────────────────────────────────────
@@ -997,8 +1332,25 @@ register('GET', '/student/dashboard/stats', async (req) => {
   const verifiedCount = userRegs.filter(r => r.status === 'verified' || r.status === 'completed').length
   const pendingCount = userRegs.filter(r => r.status === 'pending_verification').length
   const rejectedCount = userRegs.filter(r => r.status === 'rejected').length
+
+  // Wins from the winners collection
+  const userWins = winners.filter(w => w.email?.toLowerCase() === (students.find(s => s.id === userId)?.email?.toLowerCase() || ''))
+  const totalWins = userWins.length
+
+  // Unregistered: competitions eligible for this student that they have NOT registered for
+  const user = students.find(s => s.id === userId)
+  const registeredCompetitionIds = new Set(userRegs.map(r => r.competitionId))
+  const unregisteredCount = competitions.filter(c => {
+    if (registeredCompetitionIds.has(c.id)) return false
+    if (!c.startDate || new Date(c.startDate) <= new Date()) return false
+    const elig = c.eligibility
+    if (elig?.yearOfStudy?.length && user?.year && !elig.yearOfStudy.includes(user.year)) return false
+    return true
+  }).length
+
   const upcomingCompetitions = competitions
     .filter(c => new Date(c.startDate) > new Date())
+    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
     .slice(0, 5)
     .map(c => ({
       ...c,
@@ -1007,9 +1359,11 @@ register('GET', '/student/dashboard/stats', async (req) => {
 
   return ok({
     totalRegistered: userRegs.length,
-    verifiedCount,
-    pendingCount,
-    rejectedCount,
+    totalVerified: verifiedCount,
+    totalPending: pendingCount,
+    totalRejected: rejectedCount,
+    totalWins,
+    unregisteredCount,
     upcomingCompetitions,
     registrations: userRegs.map(r => ({
       ...r,

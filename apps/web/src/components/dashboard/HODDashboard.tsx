@@ -62,19 +62,20 @@ export default function HODDashboard() {
         })}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title={selectedYear === 'all' ? 'Total Students' : `${selectedYear} Students`}
-          value={selectedYear === 'all' ? (stats?.totalStudents || 0) : (yearData?.studentCount || 0)}
-          change={5}
-          changeLabel="CSE"
+          title={selectedYear === 'all' ? 'Registered' : `${selectedYear} Registered`}
+          value={selectedYear === 'all' ? (stats?.registered || 0) : (yearData?.registrationCount || 0)}
           icon={<UserCheck className="w-5 h-5" />}
         />
         <StatCard
-          title="Registrations"
-          value={selectedYear === 'all' ? (stats?.registeredCount || 0) : (yearData?.registrationCount || 0)}
-          change={-2}
-          changeLabel="total"
+          title={selectedYear === 'all' ? 'Unregistered' : `${selectedYear} Unregistered`}
+          value={selectedYear === 'all' ? (stats?.unregistered || 0) : (yearData?.unregistered || 0)}
+          icon={<Users className="w-5 h-5" />}
+        />
+        <StatCard
+          title={selectedYear === 'all' ? 'Total Expected' : `${selectedYear} Expected`}
+          value={selectedYear === 'all' ? (stats?.totalExpected || 0) : (yearData?.totalExpected || 0)}
           icon={<BookOpen className="w-5 h-5" />}
         />
         <StatCard
@@ -82,8 +83,6 @@ export default function HODDashboard() {
           value={selectedYear === 'all'
             ? (stats?.selfVerificationRequests?.length || 0)
             : (yearData?.pendingCount || 0)}
-          change={0}
-          changeLabel="need review"
           icon={<Clock className="w-5 h-5" />}
         />
       </div>

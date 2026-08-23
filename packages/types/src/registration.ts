@@ -34,14 +34,9 @@ export interface RegistrationCreate {
   verificationMethod: 'screenshot' | 'email'
   confirmationScreenshot?: string
   confirmationEmail?: string
-  /**
-   * Student identity, mirrored into `student_competitions` (which is keyed by
-   * email, not by a students FK) when a registration is created.
-   */
   userId?: string
   userEmail?: string
   userName?: string
-  /** Denormalized onto `student_competitions.competition_name`. */
   competitionTitle?: string
 }
 
@@ -67,23 +62,39 @@ export interface StudentDashboardStats {
   totalVerified: number
   totalPending: number
   totalWins: number
+  unregisteredCount: number
   registrations: Registration[]
   upcomingCompetitions: Competition[]
-  recentVerifiedRegs: Registration[]
   selfVerificationRequests: any[]
-  totalStudents?: number
-  registeredCount?: number
-  unregisteredCount?: number
-  totalCompetitions?: number
-  yearWise?: { year: string; studentCount: number; registrationCount: number; verifiedCount: number; pendingCount: number }[]
+}
+
+export interface HodDashboardStats {
+  totalStudents: number
+  openCompetitions: number
+  totalExpected: number
+  registered: number
+  unregistered: number
+  verifiedCount: number
+  pendingCount: number
+  rejectedCount: number
+  yearWise: { year: string; studentCount: number; registrationCount: number; totalExpected: number; unregistered: number; verifiedCount: number; pendingCount: number }[]
+  selfVerificationRequests: any[]
+  registrations: any[]
 }
 
 export interface DashboardStats {
   totalCompetitions: number
-  totalRegistrations: number
+  openCompetitions: number
+  totalRegistered: number
+  registered: number
+  totalExpected: number
+  unregistered: number
   verifiedRegistrations: number
+  pendingRegistrations: number
+  rejectedRegistrations: number
   verificationRate: number
   registrationsOverTime: { date: string; count: number }[]
+  verificationTrend: { date: string; count: number }[]
   topDepartments: { name: string; count: number }[]
   recentVerified: Registration[]
   pendingVerifications: Registration[]
@@ -108,11 +119,41 @@ export interface HistoryEntry {
   prize?: string
 }
 
-/**
- * Shape returned by `GET /advisor/dashboard/stats` — scoped to the signed-in
- * advisor's assigned sections. Distinct from the admin/COE dashboard payload,
- * which is department-wide.
- */
+export type OdRequestStatus = 'requested' | 'approved' | 'rejected' | 'cancelled'
+
+export interface OdRequest {
+  id: string
+  studentId: string
+  studentName: string
+  studentEmail: string
+  competitionId: string
+  competitionTitle: string
+  section: string
+  department: string
+  advisorId: string
+  advisorName: string
+  status: OdRequestStatus
+  requestedAt: string
+  reviewedAt: string | null
+  reviewedBy: string | null
+  rejectionReason: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export interface OdRequestCreate {
+  competitionId: string
+  studentId: string
+}
+
+export interface OdRequestListResponse {
+  data: OdRequest[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
 export interface AdvisorDashboardStats {
   totalStudents: number
   registeredCount: number

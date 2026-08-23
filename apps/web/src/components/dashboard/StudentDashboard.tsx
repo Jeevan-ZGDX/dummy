@@ -3,7 +3,7 @@
 import { useTranslation } from 'react-i18next'
 import { StatCard, Card, CardHeader, CardTitle, StatCardSkeleton } from '@comp-dash/design-system'
 import { useStudentDashboardStats } from '@comp-dash/api'
-import { Trophy, UserCheck, Target, Medal, Calendar } from 'lucide-react'
+import { Trophy, UserCheck, Target, Medal, Calendar, UserX } from 'lucide-react'
 
 export default function StudentDashboard() {
   const { t } = useTranslation()
@@ -39,11 +39,25 @@ export default function StudentDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title={t('home.registered')}
+          title={t('home.wins')}
+          value={wins}
+          change={0}
+          changeLabel={t('dashboard.fromLastWeek')}
+          icon={<Medal className="w-5 h-5" />}
+        />
+        <StatCard
+          title={t('Registered')}
           value={registered}
           change={2}
           changeLabel={t('dashboard.fromLastWeek')}
           icon={<Trophy className="w-5 h-5" />}
+        />
+        <StatCard
+          title={t('Unregistered')}
+          value={stats?.unregisteredCount ?? 0}
+          change={0}
+          changeLabel={t('dashboard.fromLastWeek')}
+          icon={<UserX className="w-5 h-5" />}
         />
         <StatCard
           title={t('home.verified')}
@@ -52,26 +66,12 @@ export default function StudentDashboard() {
           changeLabel={t('dashboard.fromLastWeek')}
           icon={<UserCheck className="w-5 h-5" />}
         />
-        <StatCard
-          title={t('home.pending')}
-          value={pending}
-          change={1}
-          changeLabel={t('dashboard.fromLastWeek')}
-          icon={<Target className="w-5 h-5" />}
-        />
-        <StatCard
-          title={t('home.wins')}
-          value={wins}
-          change={0}
-          changeLabel={t('dashboard.fromLastWeek')}
-          icon={<Medal className="w-5 h-5" />}
-        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>{t('home.upcomingDeadlines')}</CardTitle>
+            <CardTitle>{t('Upcoming Competitions')}</CardTitle>
           </CardHeader>
           <div className="mt-4 space-y-3">
             {(stats?.upcomingCompetitions?.length ?? 0) > 0 ? (
@@ -82,7 +82,7 @@ export default function StudentDashboard() {
                     <span className="text-sm font-medium text-gray-900">{comp.title}</span>
                   </div>
                   <span className="text-xs text-gray-500">
-                    {new Date(comp.registrationDeadline).toLocaleDateString()}
+                    {new Date(comp.startDate).toLocaleDateString()}
                   </span>
                 </div>
               ))
@@ -96,26 +96,24 @@ export default function StudentDashboard() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('home.recentlyVerified')}</CardTitle>
+            <CardTitle>{t('home.pending')}</CardTitle>
           </CardHeader>
           <div className="mt-4 space-y-3">
-            {(stats?.recentVerifiedRegs?.length ?? 0) > 0 ? (
-              stats!.recentVerifiedRegs.map((reg) => (
+            {(stats?.registrations?.filter(r => r.status === 'pending_verification').length ?? 0) > 0 ? (
+              stats!.registrations.filter(r => r.status === 'pending_verification').map((reg) => (
                 <div key={reg.id} className="flex items-center justify-between px-4 py-3 bg-gray-50 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                      <UserCheck className="w-4 h-4 text-green-600" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-900">{reg.competition.title}</span>
+                    <Target className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm font-medium text-gray-900">{reg.competition?.title}</span>
                   </div>
                   <span className="text-xs text-gray-500">
-                    {reg.verifiedAt ? new Date(reg.verifiedAt).toLocaleDateString() : '-'}
+                    {reg.registeredAt ? new Date(reg.registeredAt).toLocaleDateString() : '-'}
                   </span>
                 </div>
               ))
             ) : (
               <div className="px-4 py-3 text-center">
-                <span className="text-sm text-gray-400">{t('home.noVerified')}</span>
+                <span className="text-sm text-gray-400">{t('home.noPending')}</span>
               </div>
             )}
           </div>
