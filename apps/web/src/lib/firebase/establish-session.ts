@@ -30,11 +30,8 @@ async function postToken(idToken: string) {
  */
 export async function establishSession(user: User): Promise<SessionResult> {
   try {
-    let { response, data } = await postToken(await user.getIdToken())
-
-    if (response.ok && data.refreshRequired) {
-      ;({ response, data } = await postToken(await user.getIdToken(true)))
-    }
+    const idToken = await user.getIdToken()
+    const { response, data } = await postToken(idToken)
 
     if (!response.ok) {
       return {

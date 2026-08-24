@@ -8,7 +8,7 @@ import { getFirebaseAuth, isFirebaseConfigured } from '@/lib/firebase/client'
 import { establishSession, abandonSession } from '@/lib/firebase/establish-session'
 import { isAuthenticated } from '@/lib/auth'
 import { GoogleSignInButton } from '@/components/common/GoogleSignInButton'
-import { ThemeToggle } from '@/components/common/ThemeToggle'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 
 export default function SignInPage() {
   const router = useRouter()
@@ -52,7 +52,6 @@ export default function SignInPage() {
     }
 
     try {
-      const { signInWithEmailAndPassword } = await import('firebase/auth')
       const credential = await signInWithEmailAndPassword(auth, cleanEmail, password)
 
       // Firebase authenticated the account; the server still has to approve it
@@ -88,9 +87,6 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-obsidian-canvas relative flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">

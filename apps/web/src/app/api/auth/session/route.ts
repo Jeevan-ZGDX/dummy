@@ -102,17 +102,9 @@ export async function POST(request: NextRequest) {
     console.error('Failed to sync custom claims:', (err as Error).message)
   }
 
-  // The token in hand predates the claim write, so ask the client to refresh
-  // and resubmit rather than storing a cookie the middleware would read as
-  // role=student.
-  if (claimsChanged) {
-    return NextResponse.json({ refreshRequired: true, profile })
-  }
-
+  // Issue session cookies on the first pass to eliminate double roundtrip latency.
   const response = NextResponse.json({ refreshRequired: false, profile })
   response.cookies.set(SESSION_COOKIE, idToken, { ...cookieOptions, httpOnly: true })
-  // Readable by client code for instant role-aware rendering. Not a security
-  // boundary — the middleware always re-verifies the signed token above.
   response.cookies.set(USER_COOKIE, JSON.stringify(profile), cookieOptions)
 
   return response
