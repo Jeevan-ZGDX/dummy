@@ -1,4 +1,6 @@
 'use client'
+
+import Link from 'next/link'
 import { StatCard, Card, CardHeader, CardTitle, Badge } from '@comp-dash/design-system'
 import { useAdvisorSummary } from '@comp-dash/api'
 import { ClipboardList, Users, CheckCircle, XCircle, Trophy, AlertTriangle } from 'lucide-react'
@@ -220,7 +222,13 @@ export default function AdvisorDashboard() {
                     </td>
                     <td className="py-2.5 pr-4 text-gray-700 dark:text-zinc-300">{r.section}</td>
                     <td className="py-2.5 pr-4 text-gray-700 dark:text-zinc-300">
-                      {r.competitionName}
+                      {r.competitionId ? (
+                        <Link href={`/competitions/${r.competitionId}`} className="hover:underline">
+                          {r.competitionName}
+                        </Link>
+                      ) : (
+                        r.competitionName
+                      )}
                     </td>
                     <td className="py-2.5 pr-4 text-gray-500 dark:text-zinc-400">
                       {formatDate(r.registeredAt)}

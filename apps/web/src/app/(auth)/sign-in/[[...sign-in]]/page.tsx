@@ -70,12 +70,8 @@ export default function SignInPage() {
     }
 
     setLoading(false)
-    const next = searchParams.get('next')
-    if (next) {
-      router.push(next)
-    } else {
-      router.push('/dashboard')
-    }
+    const next = searchParams.get('next') || '/dashboard'
+    router.push(next)
     router.refresh()
   }
 

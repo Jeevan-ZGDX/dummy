@@ -226,7 +226,8 @@ export default function COEDashboard() {
               competitions.map((comp) => (
                 <div
                   key={comp.id}
-                  className="flex items-center justify-between px-4 py-3 rounded-xl transition-colors"
+                  className="flex items-center justify-between px-4 py-3 rounded-xl hover:cursor-pointer transition-colors"
+                  onClick={() => router.push(`/competitions/${comp.id}`)}
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-lg bg-accent/10 flex items-center justify-center">

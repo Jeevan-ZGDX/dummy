@@ -318,7 +318,7 @@ register('GET', '/auth/check-access', async (req) => {
   const url = new URL(req.url)
   const email = url.searchParams.get('email') || (await getAuthenticatedEmail(req)) || ''
   const result = await checkUserAccess(email)
-  return ok(result)
+  return ok({ active: result.granted, role: result.role, department: result.department })
 })
 
 register('GET', '/auth/me', async (req) => {
