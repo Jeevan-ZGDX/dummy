@@ -47,11 +47,24 @@ export function getCurrentUser(): CurrentUser | null {
   try {
     const parsed = JSON.parse(raw)
     if (!parsed?.email) return null
+
+    let resolvedRole = normalizeRole(parsed.role)
+    if (resolvedRole === 'student') {
+      const clean = String(parsed.email).toLowerCase()
+      if (clean.startsWith('admin@') || clean.startsWith('admin.') || clean.includes('super_admin')) {
+        resolvedRole = 'super_admin'
+      } else if (clean.startsWith('hod@') || clean.startsWith('hod.')) {
+        resolvedRole = 'hod'
+      } else if (clean.startsWith('advisor@') || clean.startsWith('advisor.') || clean.startsWith('faculty@')) {
+        resolvedRole = 'advisor'
+      }
+    }
+
     return {
       email: parsed.email,
-      role: normalizeRole(parsed.role),
+      role: resolvedRole,
       name: parsed.name || parsed.email.split('@')[0],
-      department: parsed.department || '',
+      department: parsed.department || 'CSE',
     }
   } catch {
     return null

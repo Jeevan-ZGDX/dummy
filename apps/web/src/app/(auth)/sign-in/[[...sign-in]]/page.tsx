@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
 import { getFirebaseAuth, isFirebaseConfigured } from '@/lib/firebase/client'
 import { establishSession, abandonSession } from '@/lib/firebase/establish-session'
+import { isAuthenticated } from '@/lib/auth'
 import { GoogleSignInButton } from '@/components/common/GoogleSignInButton'
 import { ThemeToggle } from '@/components/common/ThemeToggle'
 
@@ -17,6 +18,13 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      const next = searchParams.get('next') || '/dashboard'
+      router.replace(next)
+    }
+  }, [router, searchParams])
 
   const configured = isFirebaseConfigured()
 

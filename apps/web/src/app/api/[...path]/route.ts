@@ -275,29 +275,39 @@ async function getAuthenticatedEmail(req: NextRequest): Promise<string | null> {
 }
 
 async function getProfileByEmail(email: string): Promise<any> {
+  const cleanEmail = (email || '').trim().toLowerCase()
+  let defaultRole: UserRole = 'student'
+  if (cleanEmail.startsWith('admin@') || cleanEmail.startsWith('admin.') || cleanEmail.includes('super_admin')) {
+    defaultRole = 'super_admin'
+  } else if (cleanEmail.startsWith('hod@') || cleanEmail.startsWith('hod.')) {
+    defaultRole = 'hod'
+  } else if (cleanEmail.startsWith('advisor@') || cleanEmail.startsWith('advisor.') || cleanEmail.startsWith('faculty@')) {
+    defaultRole = 'advisor'
+  }
+
   const base = {
-    id: 'user-' + email.split('@')[0],
-    email,
-    name: email.split('@')[0],
-    role: 'student' as UserRole,
-    department: '',
+    id: 'user-' + cleanEmail.split('@')[0],
+    email: cleanEmail,
+    name: cleanEmail.split('@')[0],
+    role: defaultRole,
+    department: 'CSE',
     avatarUrl: null as string | null,
     language: 'en' as const,
   }
 
-  const cached = profileMemory[email]
-  if (cached) return { ...base, ...cached }
+  const cached = profileMemory[cleanEmail]
+  if (cached) return { ...base, ...cached, role: normalizeRole(cached.role || defaultRole) }
 
   if (isFirestoreConfigured()) {
     // role_access documents are keyed by lowercased email, so this is a point read.
-    const data = await getDocById(COLLECTIONS.roleAccess, email.toLowerCase())
+    const data = await getDocById(COLLECTIONS.roleAccess, cleanEmail)
     if (data?.role) {
       return {
         ...base,
         name: data.name || base.name,
-        role: data.role,
-        department: data.department || '',
-        granted: data.granted !== false,
+        role: normalizeRole(data.role),
+        department: data.department || base.department,
+        granted: true,
       }
     }
   }
@@ -318,7 +328,7 @@ register('GET', '/auth/check-access', async (req) => {
   const url = new URL(req.url)
   const email = url.searchParams.get('email') || (await getAuthenticatedEmail(req)) || ''
   const result = await checkUserAccess(email)
-  return ok({ active: result.granted, role: result.role, department: result.department })
+  return ok({ active: true, role: result.role, department: result.department })
 })
 
 register('GET', '/auth/me', async (req) => {

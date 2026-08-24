@@ -27,10 +27,17 @@ export interface SessionUser {
 }
 
 export function normalizeRole(role: unknown): UserRole {
-  const roleLower = String(role ?? '').toLowerCase()
-  return roleLower === 'advisor' || roleLower === 'hod' || roleLower === 'super_admin'
-    ? roleLower as UserRole
-    : 'student'
+  const roleLower = String(role ?? '').toLowerCase().trim()
+  if (roleLower === 'admin' || roleLower === 'super_admin' || roleLower === 'coe') {
+    return 'super_admin'
+  }
+  if (roleLower === 'hod') {
+    return 'hod'
+  }
+  if (roleLower === 'advisor' || roleLower === 'faculty' || roleLower === 'faculty_advisor') {
+    return 'advisor'
+  }
+  return 'student'
 }
 
 /**

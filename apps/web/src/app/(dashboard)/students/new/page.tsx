@@ -90,15 +90,13 @@ export default function AddStudentPage() {
                 </div>
                 <div>
                   <label className={labelClass}>Section</label>
-                  <select 
+                  <input 
+                    type="text" 
                     value={form.section} 
                     onChange={e => setForm({ ...form, section: e.target.value })}
-                    className={`${inputClass} cursor-pointer`}
-                  >
-                    {Array.from({ length: 20 }, (_, i) => String.fromCharCode(65 + i)).map(s => (
-                      <option key={s} value={s} className="bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-100">{s}</option>
-                    ))}
-                  </select>
+                    placeholder="Enter section (e.g. A, B, CSE-A)"
+                    className={inputClass} 
+                  />
                 </div>
               </div>
               <div className="flex gap-3 pt-4">

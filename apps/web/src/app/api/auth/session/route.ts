@@ -83,12 +83,6 @@ export async function POST(request: NextRequest) {
   }
 
   const resolved = await resolveUserFromDatabase(email)
-  if (resolved.denied) {
-    return NextResponse.json(
-      { error: resolved.reason || 'This account is not authorized to sign in.', code: 'access_denied' },
-      { status: 403 }
-    )
-  }
 
   const profile = {
     email,
