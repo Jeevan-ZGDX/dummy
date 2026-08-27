@@ -110,7 +110,7 @@ export default function SignUpPage() {
             <div className="w-16 h-16 rounded-full bg-green-50 border border-green-200 flex items-center justify-center mx-auto">
               <CheckCircle className="w-8 h-8 text-green-600" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-ink-primary">Check your email</h1>
+            <h1 className="font-display tracking-tight text-xl font-medium text-gray-900 dark:text-ink-primary">Check your email</h1>
             <p className="text-sm text-gray-500 dark:text-obsidian-faint">
               We sent a confirmation link to <span className="font-medium text-gray-700 dark:text-ink-muted">{email}</span>.
               Confirm your email, then sign in to get started.
@@ -137,7 +137,7 @@ export default function SignUpPage() {
           <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl font-bold text-accent">C</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-ink-primary mb-2">Create Account</h1>
+          <h1 className="font-display tracking-tight text-3xl font-medium text-gray-900 dark:text-ink-primary mb-2">Create Account</h1>
           <p className="text-gray-500 dark:text-obsidian-faint">Join Comp-Dash to get started</p>
         </div>
 

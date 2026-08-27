@@ -12,13 +12,13 @@ interface NotificationItemProps {
 }
 
 const typeColors: Record<NotificationType, { bg: string; icon: string }> = {
-  verification_update: { bg: 'bg-successLight dark:bg-emerald-500/15', icon: 'text-success' },
+  verification_update: { bg: 'bg-success-light dark:bg-emerald-500/15', icon: 'text-success' },
   new_competition: { bg: 'bg-primary-100 dark:bg-uv/15', icon: 'text-primary-600 dark:text-uv' },
-  deadline_reminder: { bg: 'bg-warningLight dark:bg-amber-500/15', icon: 'text-warning' },
-  registration_confirmed: { bg: 'bg-infoLight dark:bg-blue-500/15', icon: 'text-info' },
-  registration_rejected: { bg: 'bg-errorLight dark:bg-red-500/15', icon: 'text-error' },
+  deadline_reminder: { bg: 'bg-warning-light dark:bg-amber-500/15', icon: 'text-warning' },
+  registration_confirmed: { bg: 'bg-info-light dark:bg-blue-500/15', icon: 'text-info' },
+  registration_rejected: { bg: 'bg-error-light dark:bg-red-500/15', icon: 'text-error' },
   system: { bg: 'bg-gray-100 dark:bg-obsidian-hover', icon: 'text-gray-600 dark:text-ink-muted' },
-  winner_announced: { bg: 'bg-accentLight dark:bg-striver/15', icon: 'text-accent dark:text-striver' },
+  winner_announced: { bg: 'bg-accent-light dark:bg-striver/15', icon: 'text-accent dark:text-striver' },
 }
 
 const typeIcons: Record<NotificationType, string> = {

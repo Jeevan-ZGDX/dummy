@@ -2,31 +2,35 @@ import { type HTMLAttributes } from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '../utils/cn'
 
+/**
+ * Status pills.
+ *
+ * Every tinted variant previously used a camelCase colour name that Tailwind
+ * never generated, so these rendered as bare text on no background. The
+ * hyphenated names below are the classes the theme actually produces.
+ */
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full font-medium transition-colors',
+  'inline-flex items-center rounded-full font-medium whitespace-nowrap',
   {
     variants: {
       variant: {
         default: 'bg-gray-100 text-gray-700 dark:bg-obsidian-hover dark:text-ink-muted',
-        primary: 'bg-primary-100 text-primary-700 dark:bg-uv/15 dark:text-uv',
-        accent: 'bg-accentLight text-accentDark dark:bg-striver/15 dark:text-striver',
-        success: 'bg-successLight text-successDark dark:bg-emerald-500/15 dark:text-emerald-300',
-        warning: 'bg-warningLight text-warningDark dark:bg-amber-500/15 dark:text-amber-300',
-        danger: 'bg-errorLight text-errorDark dark:bg-red-500/15 dark:text-red-300',
-        info: 'bg-infoLight text-infoDark dark:bg-blue-500/15 dark:text-blue-300',
-        outline: 'border border-gray-200 bg-transparent text-gray-600 dark:border-obsidian-border dark:text-ink-muted',
+        primary: 'bg-primary-100 text-primary-700 dark:bg-accent/15 dark:text-primary-300',
+        accent: 'bg-accent-light text-accent-dark dark:bg-accent/15 dark:text-primary-300',
+        success: 'bg-success-light text-success-dark dark:bg-success/20 dark:text-success',
+        warning: 'bg-warning-light text-warning-dark dark:bg-warning/20 dark:text-warning',
+        danger: 'bg-error-light text-error-dark dark:bg-error/20 dark:text-error',
+        info: 'bg-info-light text-info-dark dark:bg-info/20 dark:text-info',
+        outline: 'border border-gray-300 bg-transparent text-gray-600 dark:border-obsidian-border dark:text-ink-muted',
       },
       size: {
-        xs: 'px-2 py-0.5 text-[10px]',
-        sm: 'px-2.5 py-0.5 text-xs',
-        md: 'px-3 py-1 text-sm',
-        lg: 'px-4 py-1.5 text-sm',
+        xs: 'px-2 py-0.5 text-[10px] gap-1',
+        sm: 'px-2.5 py-1 text-xs gap-1.5',
+        md: 'px-3 py-1 text-sm gap-1.5',
+        lg: 'px-3.5 py-1.5 text-sm gap-2',
       },
     },
-    defaultVariants: {
-      variant: 'default',
-      size: 'sm',
-    },
+    defaultVariants: { variant: 'default', size: 'sm' },
   }
 )
 
@@ -41,15 +45,16 @@ export function Badge({ className, variant, size, dot, children, ...props }: Bad
     <span className={cn(badgeVariants({ variant, size, className }))} {...props}>
       {dot && (
         <span
+          aria-hidden="true"
           className={cn(
-            'w-1.5 h-1.5 rounded-full mr-1.5',
+            'w-1.5 h-1.5 rounded-full shrink-0',
             variant === 'success' && 'bg-success',
             variant === 'warning' && 'bg-warning',
             variant === 'danger' && 'bg-error',
             variant === 'info' && 'bg-info',
-            variant === 'primary' && 'bg-primary-500',
+            variant === 'primary' && 'bg-accent',
             variant === 'accent' && 'bg-accent',
-            (!variant || variant === 'default') && 'bg-gray-500'
+            (!variant || variant === 'default' || variant === 'outline') && 'bg-gray-400'
           )}
         />
       )}

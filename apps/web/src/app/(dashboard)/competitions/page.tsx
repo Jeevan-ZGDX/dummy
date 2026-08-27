@@ -83,7 +83,7 @@ export default function CompetitionsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-ink-primary">
+              <h1 className="font-display tracking-tight text-2xl md:text-3xl font-medium text-gray-900 dark:text-ink-primary">
                 {t('sidebar.competitions') || 'Competitions Hub'}
               </h1>
               <Badge variant="primary" size="sm">

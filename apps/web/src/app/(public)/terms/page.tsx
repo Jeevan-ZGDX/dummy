@@ -28,19 +28,19 @@ export default function TermsConditionsPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <header className="mb-12 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-ink-primary mb-4">Terms & Conditions</h1>
+            <h1 className="font-display tracking-tight text-4xl sm:text-5xl font-medium text-gray-900 dark:text-ink-primary mb-4">Terms & Conditions</h1>
             <p className="text-lg text-gray-600 dark:text-ink-muted">Last updated: August 9, 2026</p>
           </header>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">1. Acceptance of Terms</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">1. Acceptance of Terms</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               By accessing and using Comp-Dash ("the Platform"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by these Terms & Conditions, please do not use this Platform.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">2. Use of the Platform</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">2. Use of the Platform</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               Comp-Dash is a competition management dashboard designed for educational institutions. You agree to use the Platform only for lawful purposes and in accordance with these Terms.
             </p>
@@ -52,7 +52,7 @@ export default function TermsConditionsPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">3. User Accounts</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">3. User Accounts</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               Certain features of the Platform require user registration. You agree to:
             </p>
@@ -65,49 +65,49 @@ export default function TermsConditionsPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">4. Intellectual Property</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">4. Intellectual Property</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               The Platform and its original content, features, and functionality are owned by Comp-Dash and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">5. Data Privacy</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">5. Data Privacy</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               Your use of the Platform is also governed by our <Link href="/security-policy" className="text-accent dark:text-uv hover:underline">Security Policy</Link>. Please review our Security Policy to understand our practices.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">6. Competition Data</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">6. Competition Data</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               Competition information displayed on the Platform is sourced from organizers and public sources. While we strive for accuracy, we do not guarantee the completeness or reliability of all competition data.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">7. Limitation of Liability</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">7. Limitation of Liability</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               In no event shall Comp-Dash, its directors, employees, or agents be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use of or inability to use the Platform.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">8. Modifications</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">8. Modifications</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               We reserve the right to modify these Terms at any time. Changes will be effective immediately upon posting. Your continued use of the Platform after any modifications constitutes acceptance of the new Terms.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">9. Governing Law</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">9. Governing Law</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               These Terms shall be governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">10. Contact Us</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">10. Contact Us</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               If you have any questions about these Terms & Conditions, please contact us at:
             </p>

@@ -6,11 +6,11 @@ const statusBadgeVariants = cva(
   {
     variants: {
       status: {
-        pending: 'bg-warningLight text-warningDark dark:bg-amber-500/15 dark:text-amber-300',
-        verified: 'bg-successLight text-successDark dark:bg-emerald-500/15 dark:text-emerald-300',
-        completed: 'bg-infoLight text-infoDark dark:bg-blue-500/15 dark:text-blue-300',
-        rejected: 'bg-errorLight text-errorDark dark:bg-red-500/15 dark:text-red-300',
-        active: 'bg-successLight text-successDark dark:bg-emerald-500/15 dark:text-emerald-300',
+        pending: 'bg-warning-light text-warning-dark dark:bg-amber-500/15 dark:text-amber-300',
+        verified: 'bg-success-light text-success-dark dark:bg-emerald-500/15 dark:text-emerald-300',
+        completed: 'bg-info-light text-info-dark dark:bg-blue-500/15 dark:text-blue-300',
+        rejected: 'bg-error-light text-error-dark dark:bg-red-500/15 dark:text-red-300',
+        active: 'bg-success-light text-success-dark dark:bg-emerald-500/15 dark:text-emerald-300',
         inactive: 'bg-gray-100 text-gray-600 dark:bg-obsidian-hover dark:text-ink-muted',
       },
       size: {

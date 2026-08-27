@@ -55,7 +55,7 @@ export default function CompetitionDashboardPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{competition.title}</h1>
+          <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-white">{competition.title}</h1>
           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-500 dark:text-zinc-400">
             <span className="flex items-center gap-1.5"><Building2 className="w-4 h-4 text-gray-400 dark:text-zinc-500" />{competition.organizer}</span>
             <span className="flex items-center gap-1.5"><Calendar className="w-4 h-4 text-gray-400 dark:text-zinc-500" />{new Date(competition.startDate).toLocaleDateString()} - {new Date(competition.endDate).toLocaleDateString()}</span>

@@ -46,7 +46,7 @@ export default function AdvisorDashboard() {
     const err = (error as any)?.response?.data?.error
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Advisor Dashboard</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-white">Advisor Dashboard</h1>
         <Card>
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
@@ -72,7 +72,7 @@ export default function AdvisorDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Advisor Dashboard</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-white">Advisor Dashboard</h1>
         <p className="text-gray-500 dark:text-zinc-400 mt-1" data-testid="advisor-identity">
           {advisor.name} · {advisor.department} · {yearScope} · Section
           {advisor.assignedSections.length === 1 ? ' ' : 's '}

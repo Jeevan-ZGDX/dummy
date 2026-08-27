@@ -28,19 +28,19 @@ export default function SecurityPolicyPage() {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20">
         <article className="prose prose-gray dark:prose-invert max-w-none">
           <header className="mb-12 text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 dark:text-ink-primary mb-4">Security Policy</h1>
+            <h1 className="font-display tracking-tight text-4xl sm:text-5xl font-medium text-gray-900 dark:text-ink-primary mb-4">Security Policy</h1>
             <p className="text-lg text-gray-600 dark:text-ink-muted">Last updated: August 9, 2026</p>
           </header>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">1. Introduction</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">1. Introduction</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               Comp-Dash takes the security of your data seriously. This Security Policy outlines the measures we implement to protect your information and the security practices we follow to maintain a secure platform.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">2. Data Encryption</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">2. Data Encryption</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-ink-muted">
               <li><strong>In Transit:</strong> All data transmitted between your browser and our servers is encrypted using TLS 1.2 or higher.</li>
               <li><strong>At Rest:</strong> Sensitive data stored in our databases is encrypted using AES-256 encryption.</li>
@@ -49,7 +49,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">3. Authentication & Access Control</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">3. Authentication & Access Control</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-ink-muted">
               <li><strong>Multi-Factor Authentication (MFA):</strong> Available for all administrative accounts.</li>
               <li><strong>Role-Based Access Control (RBAC):</strong> Users are granted minimum necessary permissions based on their role (Student, Advisor, HOD, Super Admin).</li>
@@ -60,7 +60,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">4. Data Protection & Privacy</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">4. Data Protection & Privacy</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-ink-muted">
               <li><strong>Data Minimization:</strong> We collect only the data necessary for platform functionality.</li>
               <li><strong>Student Data:</strong> Student information is used solely for competition management and verification purposes.</li>
@@ -71,7 +71,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">5. Infrastructure Security</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">5. Infrastructure Security</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-ink-muted">
               <li><strong>Cloud Hosting:</strong> Hosted on secure, compliant cloud infrastructure (Vercel/Supabase).</li>
               <li><strong>Network Security:</strong> Firewalls, DDoS protection, and intrusion detection systems.</li>
@@ -82,7 +82,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">6. Application Security</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">6. Application Security</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-ink-muted">
               <li><strong>Secure Development:</strong> Following OWASP Top 10 guidelines and secure coding practices.</li>
               <li><strong>Input Validation:</strong> Strict validation and sanitization of all user inputs.</li>
@@ -93,7 +93,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">7. Incident Response</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">7. Incident Response</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-ink-muted">
               <li><strong>Response Plan:</strong> Documented incident response procedures with defined escalation paths.</li>
               <li><strong>Notification:</strong> Affected users notified within 72 hours of confirmed data breaches as required by applicable law.</li>
@@ -103,7 +103,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">8. Compliance & Standards</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">8. Compliance & Standards</h2>
             <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-ink-muted">
               <li><strong>Data Protection:</strong> Aligned with India's DPDP Act 2023 and GDPR principles.</li>
               <li><strong>Educational Records:</strong> Compliant with relevant educational data protection regulations.</li>
@@ -113,7 +113,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">9. Vendor Security</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">9. Vendor Security</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               We evaluate the security practices of all third-party vendors and service providers before integration:
             </p>
@@ -125,7 +125,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">10. Reporting Security Issues</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">10. Reporting Security Issues</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               We encourage responsible disclosure of security vulnerabilities. If you discover a security issue, please report it to:
             </p>
@@ -137,7 +137,7 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">11. User Responsibilities</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">11. User Responsibilities</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               You play a crucial role in maintaining security:
             </p>
@@ -151,14 +151,14 @@ export default function SecurityPolicyPage() {
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">12. Policy Updates</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">12. Policy Updates</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               This Security Policy may be updated periodically to reflect changes in our practices or regulatory requirements. Significant changes will be communicated via email or platform notification.
             </p>
           </section>
 
           <section className="mb-10">
-            <h2 className="text-2xl font-semibold text-gray-900 dark:text-ink-primary mb-4">13. Contact Us</h2>
+            <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary mb-4">13. Contact Us</h2>
             <p className="text-gray-700 dark:text-ink-muted mb-4">
               For questions about this Security Policy or our security practices:
             </p>

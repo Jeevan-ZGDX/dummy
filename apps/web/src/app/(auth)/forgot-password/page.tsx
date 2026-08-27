@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
           <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <KeyRound className="w-8 h-8 text-accent" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-ink-primary mb-2">Reset Password</h1>
+          <h1 className="font-display tracking-tight text-3xl font-medium text-gray-900 dark:text-ink-primary mb-2">Reset Password</h1>
           <p className="text-sm text-gray-500 dark:text-obsidian-faint">
             Enter your email and new password to update your account
           </p>
@@ -103,7 +103,7 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-ink-primary">Password Updated!</h2>
+              <h2 className="font-display tracking-tight text-xl font-medium text-gray-900 dark:text-ink-primary">Password Updated!</h2>
               <p className="text-sm text-gray-600 dark:text-obsidian-faint">
                 {successMessage}
               </p>

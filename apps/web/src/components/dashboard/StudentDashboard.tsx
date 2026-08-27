@@ -33,7 +33,7 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white-900">{t('home.greeting', { name: 'Student' })}</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary">{t('home.greeting', { name: 'Student' })}</h1>
         <p className="text-white-500 mt-1">{t('home.subtitle')}</p>
       </div>
 

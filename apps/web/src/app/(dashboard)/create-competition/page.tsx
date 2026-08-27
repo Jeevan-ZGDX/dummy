@@ -177,7 +177,7 @@ function CreateCompetitionContent() {
   return (
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{isEdit ? 'Edit Competition' : 'Create Competition'}</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-white">{isEdit ? 'Edit Competition' : 'Create Competition'}</h1>
         {isEdit && (
           <span className="px-3 py-1 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 rounded-full text-xs text-blue-700 dark:text-blue-300 font-medium shadow-sm transition-transform duration-200 hover:scale-105">
             Editing: {form.title || editId}

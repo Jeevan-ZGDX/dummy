@@ -58,7 +58,7 @@ export default function WinnersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-ink-primary">{t('sidebar.winners')}</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary">{t('sidebar.winners')}</h1>
         <div className="flex items-center gap-3">
           <Button variant="outline" size="sm" onClick={handleExport}>
             <Download className="w-4 h-4 mr-2" />
@@ -153,7 +153,7 @@ export default function WinnersPage() {
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => !submitting && setShowModal(false)}>
           <div className="bg-white dark:bg-obsidian-surface border rounded-2xl w-full max-w-lg p-6 shadow-xl" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-ink-primary">Add New Winner</h2>
+              <h2 className="font-display tracking-tight text-lg font-medium text-gray-900 dark:text-ink-primary">Add New Winner</h2>
               <button onClick={() => setShowModal(false)} className="p-1 hover:bg-gray-100 dark:hover:bg-obsidian-hover rounded-lg transition-colors">
                 <X className="w-5 h-5 text-gray-400 dark:text-obsidian-faint" />
               </button>

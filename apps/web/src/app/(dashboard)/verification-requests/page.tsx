@@ -48,7 +48,7 @@ function YearSection({ year, requests, onVerify, verifyingId, expandedId, onTogg
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <GraduationCap className="w-5 h-5 text-accent" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-ink-primary">Class {year}</h2>
+              <h2 className="font-display tracking-tight text-lg font-medium text-gray-900 dark:text-ink-primary">Class {year}</h2>
               <span className="text-xs text-gray-400 dark:text-obsidian-faint">({requests.length} student{requests.length !== 1 ? 's' : ''})</span>
             </div>
             <div className="flex items-center gap-4 text-xs">
@@ -255,7 +255,7 @@ export default function VerificationRequestsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-ink-primary">Submitted Email Proofs</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary">Submitted Email Proofs</h1>
         <p className="text-gray-500 mt-1 dark:text-obsidian-faint">View and verify email proof submissions from students, grouped by class</p>
       </div>
 

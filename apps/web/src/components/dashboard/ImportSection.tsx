@@ -7,7 +7,7 @@ export default function ImportSection() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Data Import</h2>
+          <h2 className="font-display tracking-tight text-2xl font-medium text-gray-900">Data Import</h2>
           <p className="text-gray-500 mt-1">Import students and advisors data from CSV/Excel files</p>
         </div>
       </div>

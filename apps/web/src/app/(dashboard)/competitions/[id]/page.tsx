@@ -335,7 +335,7 @@ function CompetitionDetailContent() {
                   </span>
                 )}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">{comp.title}</h1>
+              <h1 className="font-display tracking-tight text-2xl md:text-3xl font-medium text-gray-900 dark:text-white">{comp.title}</h1>
               <p className="text-sm text-gray-500 dark:text-zinc-400 mt-1">by <span className="font-medium text-gray-700 dark:text-zinc-300">{comp.organizer}</span></p>
             </div>
             
@@ -502,7 +502,7 @@ function CompetitionDetailContent() {
           {/* Registration Verification - only shown for Students, hidden for HOD & Admin */}
           {user && user.role !== 'hod' && user.role !== 'super_admin' && (
             <div className="mt-8 pt-6 border-t border-gray-200 dark:border-zinc-800">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+              <h2 className="font-display tracking-tight text-lg font-medium text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                 <Shield className="w-5 h-5 text-accent" />
                 Registration Verification
               </h2>

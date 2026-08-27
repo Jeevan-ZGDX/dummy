@@ -42,7 +42,7 @@ export default function HODDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white-900">{departmentName} Dashboard</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary">{departmentName} Dashboard</h1>
         <p className="text-gray-500 mt-1">Departmental competition overview and verification management</p>
       </div>
 

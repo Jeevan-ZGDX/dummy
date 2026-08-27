@@ -10,6 +10,7 @@
 
 html {
   color-scheme: light;
+  -webkit-text-size-adjust: 100%;
 }
 
 html.dark {
@@ -17,22 +18,61 @@ html.dark {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans), Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #F9FAFB;
-  color: #111827;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  background-color: #FAF9F5;
+  color: #141413;
 }
 
 html.dark body {
-  background-color: #131314;
-  color: #E3E3E3;
+  background-color: #1B1A19;
+  color: #F5F4EE;
 }
 
-/* Custom scrollbar */
+/* ── Type ───────────────────────────────────────────────────────────────── */
+
+/*
+ * Page and section titles. Optical sizing keeps Newsreader from looking spindly
+ * at display sizes, and the negative tracking stops large serif headings from
+ * drifting apart.
+ */
+.font-display,
+h1.display,
+.display {
+  font-family: var(--font-display), Newsreader, Georgia, serif;
+  letter-spacing: -0.02em;
+  font-optical-sizing: auto;
+}
+
+/* Tabular figures so counts and money don't jitter as they update. */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* ── Focus ──────────────────────────────────────────────────────────────── */
+
+/*
+ * One visible focus treatment everywhere. Keyboard users get a ring; pointer
+ * users don't, so buttons stay clean when clicked.
+ */
+:focus-visible {
+  outline: 2px solid #C15F3C;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+html.dark :focus-visible {
+  outline-color: #D28A69;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -40,23 +80,29 @@ html.dark body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D1D5DB;
-  border-radius: 3px;
+  background: #D8D4C7;
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9CA3AF;
+  background: #A8A498;
+  background-clip: content-box;
 }
 
 html.dark ::-webkit-scrollbar-thumb {
-  background: #333537;
+  background: #38362F;
+  background-clip: content-box;
 }
 
 html.dark ::-webkit-scrollbar-thumb:hover {
-  background: #4D4F51;
+  background: #55524A;
+  background-clip: content-box;
 }
 
-/* Table styles */
+/* ── Tables ─────────────────────────────────────────────────────────────── */
+
 .table-container {
   @apply overflow-x-auto;
 }
@@ -82,7 +128,7 @@ html.dark .table-container td {
 }
 
 .table-container tr {
-  @apply border-b border-gray-100;
+  @apply border-b border-gray-200;
 }
 
 html.dark .table-container tr {
@@ -90,22 +136,20 @@ html.dark .table-container tr {
 }
 
 .table-container tr:hover {
-  @apply bg-gray-50;
+  @apply bg-gray-100;
 }
 
 html.dark .table-container tr:hover {
   @apply bg-obsidian-hover;
 }
 
-.table-container tr:nth-child(even) {
-  @apply bg-gray-50/50;
-}
+/*
+ * Zebra striping is dropped on purpose: with a hairline row border and a hover
+ * tint, alternating fills only add noise on a cream page.
+ */
 
-html.dark .table-container tr:nth-child(even) {
-  @apply bg-obsidian-surface/50;
-}
+/* ── Utilities ──────────────────────────────────────────────────────────── */
 
-/* No scrollbar utility */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

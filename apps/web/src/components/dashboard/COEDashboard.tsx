@@ -66,7 +66,7 @@ export default function COEDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white-900">Admin Dashboard</h1>
+          <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary">Admin Dashboard</h1>
           <p className="text-gray-500 mt-1">College-wide overview and management</p>
         </div>
         <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ export default function COEDashboard() {
                       <Trophy className="w-4 h-4 text-accent" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white-900">{comp.title}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-ink-primary">{comp.title}</p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <Badge variant="primary" size="xs">{comp.category}</Badge>
                         <span className="text-xs text-gray-400">{comp.mode}</span>

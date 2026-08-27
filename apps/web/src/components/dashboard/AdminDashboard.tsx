@@ -40,7 +40,7 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t('dashboard.title')}</h1>
+          <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900">{t('dashboard.title')}</h1>
         </div>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-xl border border-gray-200">

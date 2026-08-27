@@ -92,7 +92,7 @@ export default function SignInPage() {
           <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl font-bold text-accent">C</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-ink-primary mb-2">Welcome Back</h1>
+          <h1 className="font-display tracking-tight text-3xl font-medium text-gray-900 dark:text-ink-primary mb-2">Welcome Back</h1>
           <p className="text-gray-500 dark:text-obsidian-faint">Sign in to your Comp-Dash account</p>
         </div>
 

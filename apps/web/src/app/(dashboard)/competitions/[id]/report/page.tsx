@@ -57,7 +57,7 @@ export default function CompetitionReportPage() {
         >
           <ArrowLeft className="w-4 h-4" /> Back
         </button>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Competition Report</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-white">Competition Report</h1>
       </div>
 
       {user?.role === 'advisor' && (

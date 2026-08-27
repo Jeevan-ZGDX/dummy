@@ -36,7 +36,7 @@ export default function HistoryPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-ink-primary">My History</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary">My History</h1>
       </div>
 
       <Card padding="none" className="overflow-hidden">

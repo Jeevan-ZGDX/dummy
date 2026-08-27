@@ -70,7 +70,7 @@ export default function RegistrationsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-ink-primary">{t('sidebar.registrations')}</h1>
+        <h1 className="font-display tracking-tight text-2xl font-medium text-gray-900 dark:text-ink-primary">{t('sidebar.registrations')}</h1>
         <Button variant="outline" size="sm" onClick={handleExport}>
           <Download className="w-4 h-4 mr-2" />
           Export
