@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
 import { NextRequest } from 'next/server'
+import { denyIfSignedOut } from '@/lib/api-auth'
 import { apiOk, apiError } from '@/lib/api-response'
 import {
   ensureLoaded,
@@ -23,6 +24,9 @@ function isCompetitionActive(regDeadline: string | null | undefined): boolean {
 }
 
 export async function GET(request: NextRequest) {
+  const denied = await denyIfSignedOut()
+  if (denied) return denied
+
   await ensureLoaded()
   const { searchParams } = new URL(request.url)
   const category = searchParams.get('category')?.toLowerCase()
@@ -102,6 +106,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const denied = await denyIfSignedOut()
+  if (denied) return denied
+
   try {
     await ensureLoaded()
     const body = await request.json()

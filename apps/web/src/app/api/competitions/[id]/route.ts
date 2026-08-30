@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic'
 export const fetchCache = 'force-no-store'
 
 import { NextRequest } from 'next/server'
+import { denyIfSignedOut } from '@/lib/api-auth'
 import { apiOk, apiError } from '@/lib/api-response'
 import {
   updateDocById,
@@ -21,6 +22,9 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const denied = await denyIfSignedOut()
+  if (denied) return denied
+
   const competitionId = params.id
   if (!competitionId) {
     return apiError('BAD_REQUEST', 'Missing competition id', 400)
@@ -81,6 +85,9 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const denied = await denyIfSignedOut()
+  if (denied) return denied
+
   const competitionId = params.id
   if (!competitionId) {
     return apiError('BAD_REQUEST', 'Missing competition id', 400)
@@ -165,6 +172,9 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const denied = await denyIfSignedOut()
+  if (denied) return denied
+
   const competitionId = params.id
   if (!competitionId) {
     return apiError('BAD_REQUEST', 'Missing competition id', 400)

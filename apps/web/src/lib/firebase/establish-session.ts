@@ -41,6 +41,23 @@ export async function establishSession(user: User): Promise<SessionResult> {
       }
     }
 
+    // The server only asks for this when the claim write changed something,
+    // which in practice means a first-ever sign-in or a role change. Forcing
+    // the refresh mints a token that carries the new role, and the second
+    // exchange stores *that* as the session cookie. The server answers
+    // `refreshRequired: false` the second time, so this cannot loop.
+    if (data.refreshRequired) {
+      const refreshed = await user.getIdToken(true)
+      const second = await postToken(refreshed)
+      if (!second.response.ok) {
+        return {
+          ok: false,
+          error: second.data.error || 'Could not confirm your access level.',
+          code: second.data.code,
+        }
+      }
+    }
+
     return { ok: true }
   } catch (err) {
     return { ok: false, error: (err as Error).message || 'Network error while signing in.' }

@@ -5,6 +5,8 @@ import { useState, useEffect, useRef, useCallback, Suspense } from 'react'
 import { Card, Badge, Button } from '@comp-dash/design-system'
 import { useCompetition, useCompetitionDashboard } from '@comp-dash/api'
 import { getCurrentUser } from '@/lib/auth'
+import AdvisorRosterPanel from '@/components/competition/AdvisorRosterPanel'
+import HodSectionsPanel from '@/components/competition/HodSectionsPanel'
 import {
   Calendar, MapPin, Users, Clock, Trophy, ArrowLeft, ExternalLink,
   Globe, Building2, Target, Pencil, Mail, CheckCircle, AlertCircle,
@@ -544,6 +546,19 @@ function CompetitionDetailContent() {
                 </div>
               </div>
             </div>
+          )}
+
+          {/*
+            Role decides which breakdown belongs here. An advisor sees their own
+            sections; a HOD or admin sees the whole department. Rendering the
+            advisor roster for a HOD is what produced the "no advisor record is
+            mapped to this account" message on their own dashboard.
+          */}
+          {user?.role === 'advisor' && (
+            <AdvisorRosterPanel competitionId={params.id as string} />
+          )}
+          {(user?.role === 'hod' || user?.role === 'super_admin') && (
+            <HodSectionsPanel competitionId={params.id as string} />
           )}
         </div>
       </div>

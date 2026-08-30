@@ -84,6 +84,15 @@ export async function POST(request: NextRequest) {
 
   const resolved = await resolveUserFromDatabase(email)
 
+  // resolveUserFromDatabase reports revocation via `denied`, which nothing used
+  // to read — a revoked account still received a session.
+  if (resolved.denied) {
+    return NextResponse.json(
+      { error: resolved.reason || 'Your access to Comp-Dash has been revoked.', code: 'access_revoked' },
+      { status: 403 }
+    )
+  }
+
   const profile = {
     email,
     name: resolved.name || String(decoded.name || email.split('@')[0]),
@@ -102,8 +111,11 @@ export async function POST(request: NextRequest) {
     console.error('Failed to sync custom claims:', (err as Error).message)
   }
 
-  // Issue session cookies on the first pass to eliminate double roundtrip latency.
-  const response = NextResponse.json({ refreshRequired: false, profile })
+  // Cookies are issued on every pass, so there is always a usable session. But
+  // when the claim write actually changed something, this token predates it —
+  // the role is not in it, and the Edge middleware reads the role straight out
+  // of the cookie's token. Say so, and the client refreshes and posts again.
+  const response = NextResponse.json({ refreshRequired: claimsChanged, profile })
   response.cookies.set(SESSION_COOKIE, idToken, { ...cookieOptions, httpOnly: true })
   response.cookies.set(USER_COOKIE, JSON.stringify(profile), cookieOptions)
 

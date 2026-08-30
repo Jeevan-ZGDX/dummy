@@ -31,27 +31,33 @@ export interface ResolvedUser {
 export async function resolveUserFromDatabase(email: string): Promise<ResolvedUser> {
   const cleanEmail = email.trim().toLowerCase()
 
-  let defaultRole: UserRole = 'student'
-  if (cleanEmail.startsWith('admin@') || cleanEmail.startsWith('admin.') || cleanEmail.includes('super_admin')) {
-    defaultRole = 'super_admin'
-  } else if (cleanEmail.startsWith('hod@') || cleanEmail.startsWith('hod.')) {
-    defaultRole = 'hod'
-  } else if (cleanEmail.startsWith('advisor@') || cleanEmail.startsWith('advisor.') || cleanEmail.startsWith('faculty@')) {
-    defaultRole = 'advisor'
-  }
-
+  // Privilege is granted by a record, never inferred from the address. This
+  // used to promote anything starting with `admin@`, `hod@`, `advisor@` or
+  // `faculty@`, so the shape of an email decided what it could do.
   const fallback: ResolvedUser = {
     email: cleanEmail,
     name: cleanEmail.split('@')[0],
-    role: defaultRole,
-    department: 'CSE',
+    role: 'student',
+    department: '',
     denied: false,
   }
 
   const access = await getDocById(COLLECTIONS.roleAccess, cleanEmail)
   if (access) {
+    // granted:false is a revocation. It was previously ignored entirely, so
+    // clearing the flag removed nobody's access.
+    if (access.granted === false) {
+      return {
+        ...fallback,
+        name: access.name || fallback.name,
+        department: access.department || fallback.department,
+        denied: true,
+        reason: 'Your access to Comp-Dash has been revoked.',
+      }
+    }
     return {
       ...fallback,
+      name: access.name || fallback.name,
       role: normalizeRole(access.role),
       department: access.department || fallback.department,
     }

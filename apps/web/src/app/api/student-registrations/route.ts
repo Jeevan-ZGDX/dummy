@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { denyIfSignedOut } from '@/lib/api-auth'
 import {
   queryByField,
   createDoc,
@@ -9,6 +10,9 @@ import {
 import { COLLECTIONS } from '@/lib/firebase/config'
 
 export async function POST(request: NextRequest) {
+  const denied = await denyIfSignedOut()
+  if (denied) return denied
+
   try {
     const { userId, email, competitionId, verificationCode, registrationLink } = await request.json()
 
@@ -57,6 +61,9 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const denied = await denyIfSignedOut()
+  if (denied) return denied
+
   try {
     const { registrationId, status, verificationCode, cancellation_reason } = await request.json()
 

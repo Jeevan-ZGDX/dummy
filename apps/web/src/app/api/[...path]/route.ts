@@ -24,6 +24,7 @@ import { storeGmailTokens, getValidAccessToken as getValidGmailAccessToken, getG
 import type { UserRole } from '@/lib/auth'
 import { normalizeSection, sectionMatches, ACTIVE_YEAR_LABELS } from '@comp-dash/utils'
 import { getSessionUser } from '@/lib/firebase/server-session'
+import { normalizeRole } from '@/lib/firebase/session'
 import { refreshStudentLeaderboard, LEADERBOARD_TAG } from '@/lib/leaderboard'
 import { revalidateTag } from 'next/cache'
 
@@ -230,11 +231,40 @@ function register(method: string, pattern: string, handler: RouteHandler) {
   routes[key] = handler
 }
 
+/**
+ * Endpoints callable without a session. Everything else requires one.
+ *
+ * Kept as an explicit allowlist so the gate is default-deny: a newly registered
+ * endpoint is protected from the moment it exists, rather than relying on
+ * whoever adds it to remember a guard.
+ */
+const PUBLIC_ROUTES = new Set<string>([
+  'POST:/auth/logout',
+])
+
 async function handle(request: NextRequest, pathSegments: string[]) {
-  await ensureLoaded()
   const method = request.method
   const qs = new URL(request.url).searchParams
   const path = '/' + pathSegments.join('/')
+
+  // The Edge middleware skips /api entirely — it cannot run the Admin SDK — so
+  // this dispatcher is the only place API authentication can be enforced. It
+  // previously enforced none: 68 of 71 endpoints answered anonymous callers,
+  // including student PII and the verification writes.
+  //
+  // Checked before ensureLoaded() so an anonymous request cannot make us read
+  // collections on its behalf.
+  if (!PUBLIC_ROUTES.has(`${method}:${path}`)) {
+    const sessionUser = await getSessionUser()
+    if (!sessionUser?.email) {
+      return NextResponse.json(
+        { success: false, error: { code: 'UNAUTHENTICATED', message: 'Not signed in' } },
+        { status: 401 }
+      )
+    }
+  }
+
+  await ensureLoaded()
 
   const exactKey = `${method}:${path}`
   if (routes[exactKey]) return routes[exactKey](request, pathSegments)
@@ -262,35 +292,29 @@ async function handle(request: NextRequest, pathSegments: string[]) {
 // In-memory profile cache keyed by email (demo-grade; not a security boundary).
 const profileMemory: Record<string, any> = {}
 
-async function getAuthenticatedEmail(req: NextRequest): Promise<string | null> {
-  // The verified session cookie is authoritative; the bearer path below is a
-  // legacy fallback for callers that never carried one.
+async function getAuthenticatedEmail(_req: NextRequest): Promise<string | null> {
+  // Only the signature-verified session cookie counts. The previous fallback
+  // split the Authorization header on "-" and trusted the third segment as the
+  // caller's email, so `Bearer a-b-admin@citchennai.net` authenticated as an
+  // administrator. There is no signed bearer scheme to replace it with, so the
+  // fallback is gone rather than reimplemented.
   const sessionUser = await getSessionUser()
-  if (sessionUser?.email) return sessionUser.email
-
-  const auth = req.headers.get('authorization') || ''
-  const token = auth.replace('Bearer ', '')
-  const parts = token.split('-')
-  return parts.length >= 3 ? parts[2] || null : null
+  return sessionUser?.email ?? null
 }
 
 async function getProfileByEmail(email: string): Promise<any> {
   const cleanEmail = (email || '').trim().toLowerCase()
-  let defaultRole: UserRole = 'student'
-  if (cleanEmail.startsWith('admin@') || cleanEmail.startsWith('admin.') || cleanEmail.includes('super_admin')) {
-    defaultRole = 'super_admin'
-  } else if (cleanEmail.startsWith('hod@') || cleanEmail.startsWith('hod.')) {
-    defaultRole = 'hod'
-  } else if (cleanEmail.startsWith('advisor@') || cleanEmail.startsWith('advisor.') || cleanEmail.startsWith('faculty@')) {
-    defaultRole = 'advisor'
-  }
+  // Privilege comes from role_access, never from the shape of the address.
+  // This used to read `admin@`/`hod@`/`advisor@` prefixes and hand out the
+  // matching role, so anyone who could obtain such an address was an admin.
+  const defaultRole: UserRole = 'student'
 
   const base = {
     id: 'user-' + cleanEmail.split('@')[0],
     email: cleanEmail,
     name: cleanEmail.split('@')[0],
     role: defaultRole,
-    department: 'CSE',
+    department: '',
     avatarUrl: null as string | null,
     language: 'en' as const,
   }
@@ -302,6 +326,12 @@ async function getProfileByEmail(email: string): Promise<any> {
     // role_access documents are keyed by lowercased email, so this is a point read.
     const data = await getDocById(COLLECTIONS.roleAccess, cleanEmail)
     if (data?.role) {
+      // An explicit granted:false is a revocation. This previously returned
+      // `granted: true` unconditionally, so clearing the flag did nothing and
+      // the revoked user kept their role.
+      if (data.granted === false) {
+        return { ...base, name: data.name || base.name, role: 'student' as UserRole, granted: false }
+      }
       return {
         ...base,
         name: data.name || base.name,
@@ -316,17 +346,14 @@ async function getProfileByEmail(email: string): Promise<any> {
 }
 
 // --- AUTH ---
-register('POST', '/auth/google', async (req) => {
-  const body = await req.json()
-  const email = body.email || 'student@citchennai.net'
-  const profile = await getProfileByEmail(email)
-  const token = 'sb-' + email + '-' + Date.now()
-  return ok({ user: profile, token, refreshToken: 'sb-refresh-' + Date.now() })
-})
+// POST /auth/google removed: it accepted any email in the body and returned a
+// fabricated token, with no credential check of any kind. Real sign-in goes
+// through /api/auth/session, which verifies a Firebase ID token.
 
 register('GET', '/auth/check-access', async (req) => {
-  const url = new URL(req.url)
-  const email = url.searchParams.get('email') || (await getAuthenticatedEmail(req)) || ''
+  // Answers for the caller only. It previously trusted an ?email= parameter,
+  // which let any signed-in user enumerate other people's roles.
+  const email = (await getAuthenticatedEmail(req)) || ''
   const result = await checkUserAccess(email)
   return ok({ active: true, role: result.role, department: result.department })
 })
